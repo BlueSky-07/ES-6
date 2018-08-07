@@ -2,7 +2,7 @@
  * Browser-Slim-XML
  * @BlueSky
  *
- * Version Alpha, 2.1
+ * Version Alpha, 2.2
  *
  * Last updated: 2018/8/7
  *
@@ -278,7 +278,7 @@ const generateVirtualDOM = (template = '', dataset = {}) => {
       try {
         loopTarget = eval(loopTargetName)
       } catch (e) {
-        throw new Error(`cannot find a variable called $${loopTargetName.replace(/dataset[.]/g, '')} from dataset`)
+        throw new Error(`cannot find a variable called ${loopTargetName.replace(/dataset[.]/g, '$')} from dataset`)
       }
       if (!Array.isArray(loopTarget)) {
         throw new Error(`$${loopTargetName.replace(/dataset[.]/g, '')} must be an array`)
@@ -320,7 +320,7 @@ const generateVirtualDOM = (template = '', dataset = {}) => {
       try {
         conditionTarget = eval(conditionTargetName)
       } catch (e) {
-        throw new Error(`cannot calculate the result of $${conditionTargetName.replace(/dataset[.]/g, '')}`)
+        throw new Error(`cannot calculate the result of ${conditionTargetName.replace(/dataset[.]/g, '$')}`)
       }
       try {
         const ifTemplate = getTemplateOfBlock(i, lines)
@@ -343,10 +343,21 @@ const generateVirtualDOM = (template = '', dataset = {}) => {
     }
   
     // read data from dataset
-    line = line.replace(
-        /{{[^}]*}}/g,
-        reg => eval(reg.slice(2, -2))
-    )
+    try {
+      line = line.replace(
+          /{{[^}]*}}/g,
+          reg => {
+            reg = reg.slice(2, -2)
+            try {
+              return eval(reg)
+            } catch (e) {
+              throw new Error(`cannot calculate the result of ${reg.replace(/dataset[.]/g, '$')}`)
+            }
+          }
+      )
+    } catch (e) {
+      throw e
+    }
     
     // set attributes
     if (line.startsWith('~')) {
