@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BSFetch - Get no body</title>
+</head>
+<body>
+<div id="out">
+  <h3>BSFetch - Get no body</h3>
+</div>
+<script type="module">
+  import BSFetch from '//node.com/modules/BSFetch.js'
+  
+  const $ = document.querySelector.bind(document)
+  const url = 'data1.json'
+  
+  const print = json => {
+    $('#out').innerHTML += `<p>${JSON.stringify(json)}</p>`
+    console.log(json)
+  }
+  
+  const test = async () => {
+    // call await fetch
+    let json = await BSFetch.get(url)
+    print('await fetch: ')
+    print(json)
+    // another way to call await fetch
+    json = await BSFetch.fetch(url, 'Get')
+    print('another await fetch: ')
+    print(json)
+    
+    // call promise fetch
+    BSFetch.get(url)
+        .then(
+            json => {
+              print('promise fetch: ')
+              print(json)
+            }
+        )
+        .catch(
+            e => {
+              throw e
+            }
+        )
+    // another way to call promise fetch
+    BSFetch.fetch(url, 'Get')
+        .then(
+            json => {
+              print('another promise fetch: ')
+              print(json)
+            }
+        )
+        .catch(
+            e => {
+              throw e
+            }
+        )
+  }
+  
+  test()
+</script>
+</body>
+</html>

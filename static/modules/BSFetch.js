@@ -2,9 +2,9 @@
  * Browser-Simple-Fetch
  * @BlueSky
  *
- * Version Alpha, 0.1
+ * Version Alpha, 0.2
  *
- * Last updated: 2018/8/6
+ * Last updated: 2018/8/7
  *
  */
 import BSData from './BSData.js'
@@ -41,20 +41,21 @@ class BSFetch {
     return this.fetch(url, 'POST', {data, config})
   }
   
-  static async fetch(url = '', method = '', {data = {}, config = {json: false, cookies: false, await: false}} = {}) {
+  static async fetch(url = '', method = '', {
+    data = {}, reqtype = 'body', restype = 'json', cookies = false
+  } = {}) {
     const request = new Request(url)
-    
     method = method.toLowerCase()
-    if (['get', 'post'].includes(method)) {
+    if (fetchMethods.has(method)) {
       request.method = method.toUpperCase()
     } else {
-      throw new Error('method must be set, valid values: ["Get", "Post"]')
+      request.method = 'GET'
     }
     
     if (request.method === 'GET') {
       request.url += '?' + BSData.object_to_body(data)
     } else {
-      if (config.json) {
+      if (reqtype === 'json') {
         request.body = BSData.object_to_json(data)
         request.headers = {
           'Content-Type': 'application/json'
@@ -67,14 +68,28 @@ class BSFetch {
       }
     }
     
-    if (config.cookies) {
+    if (restype) {
+      restype = restype.toLowerCase()
+      const responseTypes = new Set([
+        'json', 'text', 'blob'
+      ])
+      if (responseTypes.has(restype)) {
+        request.responseType = restype.toUpperCase()
+      } else {
+        request.responseType = 'JSON'
+      }
+    } else {
+      request.responseType = 'JSON'
+    }
+    
+    if (cookies) {
       request.credentials = 'include'
     }
     
-    if (config.await) {
-      return await doRequest_await(request)
-    } else {
+    try {
       return doRequest(request)
+    } catch (e) {
+      throw e
     }
   }
   
@@ -90,7 +105,19 @@ const doRequest = (request = new Request()) => {
     fetch(
         request.url, request.config
     ).then(
-        response => response.json()
+        response => {
+          if (!response.ok) {
+            throw new Error(`cannot fetch resource: ${response.status} - ${response.statusText}`)
+          }
+          switch (request.responseType) {
+            case 'JSON':
+              return response.json()
+            case 'text':
+              return response.text()
+            case 'blob':
+              return response.blob()
+          }
+        }
     ).then(
         data => {
           resolve(data)
@@ -103,22 +130,9 @@ const doRequest = (request = new Request()) => {
   })
 }
 
-const doRequest_await = async (request = new Request()) => {
-  let result = {}
-  await fetch(
-      request.url, request.config
-  ).then(
-      response => response.json()
-  ).then(
-      data => {
-        result = data
-      }
-  ).catch(
-      e => {
-        throw e
-      }
-  )
-  return result
-}
+// Reference: https://fetch.spec.whatwg.org/#methods
+const fetchMethods = new Set([
+  'delete', 'get', 'head', 'options', 'post', 'put'
+])
 
 export default BSFetch
