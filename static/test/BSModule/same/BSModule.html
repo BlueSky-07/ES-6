@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BSModule same</title>
+</head>
+<body>
+<button>a</button>
+<button>b</button>
+<div id="out"></div>
+<script type="module">
+  import BSModule from '//node.com/modules/BSModule.js'
+  
+  const router = new BSModule({
+    js_root: './'
+  })
+  
+  const data = {
+    a: 0, b: 0
+  }
+  
+  const init = () => {
+    [].forEach.call(document.querySelectorAll('button'), btn => {
+      btn.addEventListener('click', () => {
+        const path = btn.innerHTML
+        data[path]++;
+        router.goto(
+            'out',
+            {
+              data: Object.assign(data, {__src__: path})
+            }
+        )
+      })
+    })
+  }
+  
+  init()
+</script>
+</body>
+</html>

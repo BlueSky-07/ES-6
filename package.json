@@ -1,0 +1,17 @@
+{
+  "name": "ES-6",
+  "version": "1.0.0",
+  "description": "BlueSky's ES-6 Modules",
+  "main": "",
+  "directories": {
+    "test": ""
+  },
+  "scripts": {
+    "app": "node app.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BSFetch</title>
+</head>
+<body>
+<script type="module">
+  import BSFetch from '//node.com/modules/BSFetch.js'
+  
+  const f = async () => {
+    const a = await BSFetch.get('data.json', {config: {await: true}})
+    console.log(a)
+    BSFetch.get('data.json')
+        .then(
+            json => {
+              console.log(json)
+            }
+        )
+        .catch(
+            e => {
+              throw e
+            }
+        )
+  }
+  
+  f()
+</script>
+</body>
+</html>

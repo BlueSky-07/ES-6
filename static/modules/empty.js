@@ -1,0 +1,1 @@
+// this .js is used for calling callback functions after adding new scripts
