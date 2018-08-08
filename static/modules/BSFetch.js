@@ -2,7 +2,7 @@
  * Browser-Simple-Fetch
  * @BlueSky
  *
- * Version Alpha, 0.2
+ * Version Alpha, 0.3
  *
  * Last updated: 2018/8/7
  *
@@ -33,12 +33,12 @@ class BSFetch {
     BSFetch.port = port
   }
   
-  static async get(url = '', {data = {}, config = {}} = {}) {
-    return this.fetch(url, 'GET', {data, config})
+  static async get(url = '', {data = {}, reqtype = 'body', restype = 'json', cookies = false} = {}) {
+    return this.fetch(url, 'GET', {data, reqtype, restype, cookies})
   }
   
-  static async post(url = '', {data = {}, config = {}} = {}) {
-    return this.fetch(url, 'POST', {data, config})
+  static async post(url = '', {data = {}, reqtype = 'body', restype = 'json', cookies = false} = {}) {
+    return this.fetch(url, 'POST', {data, reqtype, restype, cookies})
   }
   
   static async fetch(url = '', method = '', {
@@ -112,9 +112,9 @@ const doRequest = (request = new Request()) => {
           switch (request.responseType) {
             case 'JSON':
               return response.json()
-            case 'text':
+            case 'TEXT':
               return response.text()
-            case 'blob':
+            case 'BLOB':
               return response.blob()
           }
         }
