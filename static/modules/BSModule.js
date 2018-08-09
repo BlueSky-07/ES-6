@@ -2,11 +2,12 @@
  * Browser-Simple-Module
  * @BlueSky
  *
- * Version Alpha, 0.3
+ * Version Alpha, 1.0
  *
- * Last updated: 2018/8/6
+ * Last updated: 2018/8/9
  *
  */
+import md5 from './libs/md5.js'
 import BSData from './BSData.js'
 
 const $ = document.querySelector.bind(document)
@@ -18,83 +19,139 @@ class BSModule {
     this.emptyjs = `${js_root}${emptyjs}`
   }
   
-  static add_js(id, src, callback) {
+  static add_js(id, src, {callback = '', type = ''} = {}) {
     try {
-      $(`#${id}`).remove();
+      $(`#${id}`).remove()
     } catch (e) {
     }
-    const newScript = document.createElement("script");
-    newScript.src = `${src}?${new Date().getTime()}`;
-    newScript.id = id;
-    newScript.onload = callback;
-    newScript.type = 'module';
-    document.body.appendChild(newScript);
+    if (typeof id !== 'string' || id.length === 0) {
+      throw new Error('id must be set as a not empty string')
+    }
+    if (typeof src !== 'string' || src.length === 0) {
+      throw new Error('src must be set as a not empty string')
+    }
+    
+    const newScript = document.createElement('script')
+    newScript.src = `${src}?${new Date().getTime()}`
+    newScript.id = id
+    
+    callback = callback || new Function()
+    if (typeof callback !== 'function') {
+      throw new Error('callback must be a function without args')
+    } else {
+      newScript.onload = callback
+    }
+    if (type === 'module') {
+      newScript.type = 'module'
+    }
+    document.body.appendChild(newScript)
   }
   
   add_module(name = '', {src = '', callback = ''} = {}) {
-    src = src || name
-    callback = callback || (() => {
-    })
-    BSModule.add_js(`${this.id_prefix}${name}`, `${this.js_root}${src}.js`, callback)
+    BSModule.add_js(`${this.id_prefix}${name}`, `${this.js_root}${src || name}.js`, {callback, type: 'module'})
   }
   
   add_modules(modules = [], callback = '') {
-    callback = callback || (() => {
-    })
     for (let {name, src} of modules) {
       this.add_module(name, {src})
     }
-    BSModule.add_js(`${this.id_prefix}callback`, this.emptyjs, callback)
+    BSModule.add_js(`${this.id_prefix}callback`, this.emptyjs, {callback, type: 'module'})
   }
   
-  goto(module_name = '', {htmlpath = '', data = {}} = {}) {
+  // import module or go to another page
+  auto(module_name = '', {htmlpath = '', data = {}} = {}) {
     const current_htmlpath = location.pathname
     const target_htmlpath = htmlpath || current_htmlpath
-    const transferring_data = Object.assign(data, {
-      __from__: current_htmlpath
-    })
-    location.href = `${target_htmlpath}#${module_name}?${BSData.object_to_body(transferring_data)}`
-    this.render_module()
-  }
-  
-  render_module() {
-    const module_name = location.hash.match(/#[\w-_]+/)[0].slice(1) || ''
-    const raw_data = location.hash.replace(/#[\w]+[\?]?/, '') || ''
-    BSModule.data = BSData.body_to_object(raw_data) || ''
-    data_hide_props()
-    const src = BSModule.data.__src__ || module_name
-    this.add_module(
-        module_name
-        , {
-          src
-          , callback: () => {
-            location.href = `${location.pathname}#${module_name}?${BSData.object_to_body(copy_data_hide_props())}`
+    if (current_htmlpath === target_htmlpath) {
+      BSModule.dataStorage[module_name] = data
+      this.apply_module(module_name, true)
+    } else {
+      const transferring_data = Object.assign(
+          data, {
+            _from_: current_htmlpath
           }
-        })
-  }
-}
-
-const data_hide_props = () => {
-  for (const prop of ['__from__', '__src__']) {
-    Object.defineProperty(
-        BSModule.data, prop, {
-          value: BSModule.data[prop]
-          , configurable: false
-          , enumerable: false
-          , writable: false
-        })
-  }
-}
-
-const copy_data_hide_props = () => {
-  const copy = Object.assign(BSModule.data, {})
-  for (const prop of ['__from__', '__src__']) {
-    try {
-      delete copy[prop]
-    } catch (e) {
+      )
+      location.href = `${target_htmlpath}#${module_name}?${BSData.object_to_body(transferring_data)}`
     }
   }
-  return copy
+  
+  apply_module(module_name = '', is_current = false) {
+    if (!is_current) {
+      module_name = (location.hash.split('?')[0] || '').slice(1)
+      if (module_name.startsWith('/')) {
+        const path = module_name
+        try {
+          module_name = this.routers[md5(path)].module_name
+        } catch (e) {
+          throw new Error(`router for ${path} must be registered before apply`)
+        }
+      }
+      const raw_data = location.hash.slice(location.hash.split('?')[0].length)
+      BSModule.dataStorage[module_name] = BSData.body_to_object(raw_data) || {}
+    }
+    if (module_name) {
+      const src = BSModule.dataStorage[module_name]._src_ || module_name
+      this.add_module(module_name, {src})
+    }
+  }
+  
+  router(path = '', module_name = '', {data = {}} = {}) {
+    BSModule.dataStorage[module_name] = data
+    location.href = `${location.pathname}#${path}`
+    this.apply_module(module_name, true)
+  }
+  
+  register_router(path = '', module_name = {}) {
+    if (path[0] !== '/') {
+      throw new Error('path must start with /')
+    }
+    if (!this.routers) {
+      this.routers = {}
+    }
+    const hash = md5(path)
+    this.routers[hash] = {path, module_name}
+    if (!BSModule.hashchange_event_registered) {
+      BSModule.hashchange_event_registered = true
+      window.onhashchange = () => {
+        this.apply_module()
+      }
+    }
+  }
+  
+  register_routers(routers = []) {
+    if (Array.isArray(routers)) {
+      for (const router of routers) {
+        if (Array.isArray(router)) {
+          const [path, module_name] = router
+          this.register_router(path, module_name)
+        } else if (router.path && router.module_name) {
+          const {path, module_name} = router
+          this.register_router(path, module_name)
+        } else {
+          throw new Error('item should be [path, module_name] or {path, module_name}')
+        }
+      }
+    } else {
+      throw new Error('routers should be an array')
+    }
+  }
+  
+  goto(path = '', {data = {}} = {}) {
+    const hash = md5(path)
+    if (this.routers[hash]) {
+      this.router(this.routers[hash].path, this.routers[hash].module_name, {data})
+    } else {
+      throw new Error(`${path} has not be registered`)
+    }
+  }
+  
+  static prevent_index_html(filename = 'index.html', index_path = '/') {
+    if (location.pathname.endsWith(filename)) {
+      location.href = `${location.pathname.slice(0, 0 - (filename.length))}#${index_path}`
+    }
+  }
 }
+
+BSModule.dataStorage = {}
 
 export default BSModule

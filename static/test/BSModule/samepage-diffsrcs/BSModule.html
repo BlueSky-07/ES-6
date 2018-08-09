@@ -4,19 +4,17 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BSModule - different modules</title>
+  <title>BSModule - same page, same module with different srcs</title>
 </head>
 <body>
+<h3>same page, same module with different src</h3>
 <button>a</button>
 <button>b</button>
-<div id="out">
-  <div id="a"></div>
-  <div id="b"></div>
-</div>
+<div id="out"></div>
 <script type="module">
   import BSModule from '//node.com/modules/BSModule.js'
   
-  const router = new BSModule({
+  const manager = new BSModule({
     js_root: './'
   })
   
@@ -29,7 +27,12 @@
       btn.addEventListener('click', () => {
         const path = btn.innerHTML
         data[path]++;
-        router.goto(path, {data: {count_of_added: data[path]}})
+        manager.auto(
+            'module',
+            {
+              data: Object.assign(data, {_src_: path})
+            }
+        )
       })
     })
   }

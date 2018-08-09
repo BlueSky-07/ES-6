@@ -1,0 +1,1 @@
+document.querySelector('#page').innerHTML = 'this is index page. <a href="#/login">login</a>'

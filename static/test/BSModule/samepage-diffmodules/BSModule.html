@@ -4,20 +4,24 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BSModule - same module</title>
+  <title>BSModule - same page, different modules</title>
 </head>
 <body>
+<h3>same page, different modules</h3>
 <button>a</button>
 <button>b</button>
-<div id="out"></div>
+<div id="out">
+  <div id="a"></div>
+  <div id="b"></div>
+</div>
 <script type="module">
   import BSModule from '//node.com/modules/BSModule.js'
   
-  const router = new BSModule({
+  const manager = new BSModule({
     js_root: './'
   })
   
-  const data = {
+  const count = {
     a: 0, b: 0
   }
   
@@ -25,13 +29,10 @@
     [].forEach.call(document.querySelectorAll('button'), btn => {
       btn.addEventListener('click', () => {
         const path = btn.innerHTML
-        data[path]++;
-        router.goto(
-            'out',
-            {
-              data: Object.assign(data, {__src__: path})
-            }
-        )
+        count[path]++;
+        const data = {}
+        data[path] = count[path]
+        manager.auto(path, {data: data})
       })
     })
   }
