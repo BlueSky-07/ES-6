@@ -8,8 +8,15 @@
 </head>
 <body>
 <div id="page">
-  this is intro page. <a href="#/">index</a>
+  <p>this is <span id="page_name">intro</span> page.</p>
+  <p><a href="#/">#/</a></p>
+  <p><a href="#/login">#/login</a></p>
+  <p><a href="#/?msg=msg%20set%20by%20link%20#/">#/?msg=msg%20set%20by%20link%20#/</a></p>
+  <p><a href="#/login?msg=msg%20set%20by%20link%20#/login">#/login?msg=msg%20set%20by%20link%20#/login</a></p>
+  <p><button url="/">goto('/')</button></p>
+  <p><button url="/login">goto('/login')</button></p>
 </div>
+<div id="data"></div>
 <script type="module">
   import BSModule from '//node.com/modules/BSModule.js'
   
@@ -24,7 +31,26 @@
   )
   
   manager.apply_module()
-
+  
+  new Array().forEach.call(
+      document.querySelectorAll('button'),
+      button => {
+        button.addEventListener(
+            'click',
+            () => {
+              manager.goto(
+                  button.getAttribute('url'),
+                  {
+                    data: {
+                      msg: `msg set by goto('${button.getAttribute('url')}')`
+                    }
+                  }
+              )
+            }
+        )
+      }
+  )
+  
   BSModule.prevent_index_html()
 </script>
 </body>

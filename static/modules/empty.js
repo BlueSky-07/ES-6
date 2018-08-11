@@ -1,1 +1,1 @@
-// this .js is used for calling callback functions after adding new scripts
+// this .js is used to call the callback function after importing new modules

@@ -2,9 +2,9 @@
  * Browser-Simple-Module
  * @BlueSky
  *
- * Version Alpha, 1.0
+ * Version Alpha, 1.1
  *
- * Last updated: 2018/8/9
+ * Last updated: 2018/8/10
  *
  */
 import md5 from './libs/md5.js'
@@ -13,7 +13,7 @@ import BSData from './BSData.js'
 const $ = document.querySelector.bind(document)
 
 class BSModule {
-  constructor({id_prefix = 'js_module_', js_root = 'js/', emptyjs = 'empty.js'}) {
+  constructor({id_prefix = 'js_module_', js_root = 'js/', emptyjs = 'empty.js'} = {}) {
     this.id_prefix = id_prefix
     this.js_root = js_root
     this.emptyjs = `${js_root}${emptyjs}`
@@ -52,8 +52,10 @@ class BSModule {
   }
   
   add_modules(modules = [], callback = '') {
-    for (let {name, src} of modules) {
-      this.add_module(name, {src})
+    for (const module of modules) {
+      for (const {name, src} of module) {
+        this.add_module(name, {src})
+      }
     }
     BSModule.add_js(`${this.id_prefix}callback`, this.emptyjs, {callback, type: 'module'})
   }
@@ -75,30 +77,29 @@ class BSModule {
     }
   }
   
-  apply_module(module_name = '', is_current = false) {
+  apply_module(module_name = '', is_current = false, is_router = false) {
     if (!is_current) {
       module_name = (location.hash.split('?')[0] || '').slice(1)
       if (module_name.startsWith('/')) {
         const path = module_name
         try {
           module_name = this.routers[md5(path)].module_name
+          is_router = true
         } catch (e) {
           throw new Error(`router for ${path} must be registered before apply`)
         }
       }
-      const raw_data = location.hash.slice(location.hash.split('?')[0].length)
+      const raw_data = location.hash.slice(location.hash.split('?')[0].length + 1)
       BSModule.dataStorage[module_name] = BSData.body_to_object(raw_data) || {}
     }
     if (module_name) {
+      BSModule.lastModuleName = module_name
+      if (is_router) {
+        delete BSModule.dataStorage[module_name]._src_
+      }
       const src = BSModule.dataStorage[module_name]._src_ || module_name
       this.add_module(module_name, {src})
     }
-  }
-  
-  router(path = '', module_name = '', {data = {}} = {}) {
-    BSModule.dataStorage[module_name] = data
-    location.href = `${location.pathname}#${path}`
-    this.apply_module(module_name, true)
   }
   
   register_router(path = '', module_name = {}) {
@@ -113,7 +114,11 @@ class BSModule {
     if (!BSModule.hashchange_event_registered) {
       BSModule.hashchange_event_registered = true
       window.onhashchange = () => {
-        this.apply_module()
+        if (BSModule.gotoPreventApplyAgain) {
+          BSModule.gotoPreventApplyAgain = false
+        } else {
+          this.apply_module()
+        }
       }
     }
   }
@@ -139,13 +144,17 @@ class BSModule {
   goto(path = '', {data = {}} = {}) {
     const hash = md5(path)
     if (this.routers[hash]) {
-      this.router(this.routers[hash].path, this.routers[hash].module_name, {data})
+      BSModule.gotoPreventApplyAgain = true
+      const module_name = this.routers[hash].module_name
+      BSModule.dataStorage[module_name] = data
+      location.href = `${location.pathname}#${path}`
+      this.apply_module(module_name, true, true)
     } else {
       throw new Error(`${path} has not be registered`)
     }
   }
   
-  static prevent_index_html(filename = 'index.html', index_path = '/') {
+  static prevent_index_html({filename = 'index.html', index_path = '/'} = {}) {
     if (location.pathname.endsWith(filename)) {
       location.href = `${location.pathname.slice(0, 0 - (filename.length))}#${index_path}`
     }

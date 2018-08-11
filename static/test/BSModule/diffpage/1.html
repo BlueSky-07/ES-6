@@ -20,13 +20,14 @@
   manager.apply_module()
   
   const data = {
-    msg: 'this data is from page 1'
+    msg: 'this data is from page 1',
+    _src_: 'result'
   }
   
   document.querySelector('button').addEventListener(
       'click',
       () => {
-        manager.auto('result', {htmlpath: '2.html', data})
+        manager.auto('1', {htmlpath: '2.html', data})
       }
   )
 </script>

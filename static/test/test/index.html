@@ -1,0 +1,17 @@
+<body>
+<script type="module">
+  import BSModule from 'https://static.ihint.me/BSModule.js'
+  
+  const manager = new BSModule({
+    js_root: './'
+  })
+  
+  // https://static.ihint.me/BSModule.js 里没有 to_another_page() 方法
+  // 如需运行此处代码先替换成 auto，这是一个改进版方法，会在下文中说明
+  manager.auto('test', {htmlpath: 'target.html',
+    data: {
+      msg: 'this msg set from index.html'
+    }
+  })
+</script>
+</body>

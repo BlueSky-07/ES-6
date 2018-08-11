@@ -1,1 +1,4 @@
-document.querySelector('#page').innerHTML = 'this is login page. <a href="#/">index</a>'
+import BSModule from '//node.com/modules/BSModule.js'
+
+document.querySelector('#page_name').innerHTML = 'login'
+document.querySelector('#data').innerHTML = `data:${JSON.stringify(BSModule.dataStorage.login)}<br>`
