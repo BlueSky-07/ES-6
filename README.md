@@ -3,9 +3,10 @@
 ### BSModule
 
 `Browser-Simple-Module`
-`v1.1` 
-[源码]((https://github.com/BlueSky-07/ES-6/blob/master/static/modules/BSModule.js))
-[测试](https://github.com/BlueSky-07/ES-6/tree/master/static/test/BSModule)
+`v1.1`
+
+[源码](/static/modules/BSModule.js)
+[测试](/static/test/BSModule)
 
 这是一个关于页面组件载入的简单实现。该工具仅用作学习用途，如需在实际环境中使用还需要更多的测试与完善。
 
