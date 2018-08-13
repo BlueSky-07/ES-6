@@ -62,9 +62,9 @@ ihint.me: [https://pages.ihint.me/?BSModule](https://pages.ihint.me/?BSModule)
 
 2. 安装 [Maven 3.*](http://maven.apache.org/)
 
-3. 在 `test/BSFetch` 下执行 `mvn spring-boot:run`，等待依赖环境部署完毕
+3. 在 `/test/BSFetch` 下执行 `mvn spring-boot:run`，等待依赖环境部署完毕
 
-4. 打开浏览器，访问 `http://localhost/?.html`，所有的 `html` 文件位于 `test/BSFetch/src/main/resources/static/` 下
+4. 打开浏览器，访问 `http://localhost/?.html`，所有的 `html` 文件位于 `/test/BSFetch/src/main/resources/static` 下
 
 5. 打开浏览器控制台查看结果
 
