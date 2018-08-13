@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GET</title>
+</head>
+<body>
+<form onsubmit="return false">
+  <p>
+    <input type="text" name="text">
+    <input type="submit">
+  </p>
+  <p id="result"></p>
+</form>
+<p>
+  <button id="google-btn">google.png</button>
+</p>
+<p>
+  <img id="google">
+</p>
+<p>
+  <button id="text-btn">text.txt</button>
+</p>
+<p id="text">
+</p>
+<script type="module">
+  import BSFetch from './js/BSFetch.js'
+  
+  BSFetch.get('/get/msg?text=hello', {debug: true}).then(json => {
+    console.log(json)
+  })
+  
+  BSFetch.fetch('/get/msg', 'get', {
+    debug: true,
+    data: {
+      text: 'hello'
+    }
+  }).then(json => {
+    console.log(json.result)
+  })
+  
+  document.forms[0].addEventListener('submit', async () => {
+    const json = await BSFetch.get('/get/msg', {
+      debug: true,
+      data: new FormData(document.forms[0]),
+      reqtype: 'formdata'
+    })
+    document.querySelector('#result').innerHTML = json.result
+    if (json.status === 'ERROR') {
+      document.querySelector('#result').style.color = '#f00'
+    } else if (json.status === 'SUCCESS') {
+      document.querySelector('#result').style.color = '#0f0'
+    }
+  })
+
+  document.querySelector('#google-btn').addEventListener('click', () => {
+    BSFetch.get('data/google.png', {
+      debug: true,
+      restype: 'blob'
+    }).then(img => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        document.querySelector('#google').src = reader.result
+      }
+      reader.readAsDataURL(img)
+    })
+  })
+  
+  document.querySelector('#text-btn').addEventListener('click', () => {
+    BSFetch.get('data/text.txt', {
+      debug: true,
+      restype: 'text'
+    }).then(text => {
+      document.querySelector('#text').innerHTML = text
+    })
+  })
+</script>
+</body>
+</html>

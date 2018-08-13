@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cookie</title>
+</head>
+<body>
+<script type="module">
+  import BSFetch from './js/BSFetch.js'
+  
+  (async () => {
+    document.cookie = 'msg=; expire=0; path=/'
+    console.log(await BSFetch.get('/cookie/read', {
+      debug: true,
+      restype: 'text'
+    }))
+  
+    console.log(await BSFetch.get('/cookie/set', {
+      debug: true,
+      restype: 'text'
+    }))
+  
+    console.log(await BSFetch.get('/cookie/read', {
+      debug: true,
+      restype: 'text'
+    }))
+  
+    console.log(await BSFetch.get('/cookie/read', {
+      cookies: false,
+      debug: true,
+      restype: 'text'
+    }))
+  })()
+</script>
+</body>
+</html>

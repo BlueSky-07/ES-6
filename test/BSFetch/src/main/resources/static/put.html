@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PUT</title>
+</head>
+<body>
+<form onsubmit="return false">
+  <p>
+    <input type="text" name="text">
+    <select id="type">
+      <option>default</option>
+      <option>json</option>
+      <option>formdata</option>
+    </select>
+    <input type="submit">
+  </p>
+</form>
+<form onsubmit="return false">
+  <p>
+    <input type="file" name="file">
+    <input type="submit">
+  </p>
+</form>
+<p id="result"></p>
+<script type="module">
+  import BSFetch from './js/BSFetch.js'
+  
+  Object.defineProperty(Number.prototype, 'means', {
+    get() {
+      return () => {
+        switch (this) {
+          case 201:
+            return 'created'
+          case 204:
+            return 'no changes'
+          case 200:
+            return 'updated'
+          default:
+            return 'unknown'
+        }
+      }
+    }
+  })
+  
+  BSFetch.put('/put/msg/default', {
+    debug: true,
+    data: {
+      text: 'hello'
+    }
+  }).then(status => {
+    console.log(status.means())
+  })
+  
+  document.forms[0].addEventListener('submit', () => {
+    const type = document.querySelector('#type').value
+    BSFetch.put(`/put/msg/${type}`, {
+      debug: true,
+      data: new FormData(document.forms[0]),
+      reqtype: document.querySelector('#type').value
+    }).then(s => {
+      document.querySelector('#result').innerHTML = s.means()
+    })
+  })
+  
+  document.forms[1].addEventListener('submit', () => {
+    BSFetch.put('/put/file', {
+      debug: true,
+      data: new FormData(document.forms[1]),
+      reqtype: 'formdata'
+    }).then(s => {
+      document.querySelector('#result').innerHTML = s.means() + ", check debug info from console of server side"
+    })
+  })
+</script>
+</body>
+</html>

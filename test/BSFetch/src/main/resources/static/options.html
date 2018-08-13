@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OPTIONS</title>
+</head>
+<body>
+<script type="module">
+  import BSFetch from './js/BSFetch.js'
+  
+  BSFetch.fetch('/options', 'options', {debug: true}).then(headers => {
+    for (const entry of headers.entries()) {
+      const [key, value] = entry
+      console.log(`${key}: ${value}`)
+    }
+  })
+  
+  BSFetch.options('/options', {debug: true}).then(headers => {
+    for (const entry of headers.entries()) {
+      const [key, value] = entry
+      console.log(`${key}: ${value}`)
+    }
+  })
+</script>
+</body>
+</html>

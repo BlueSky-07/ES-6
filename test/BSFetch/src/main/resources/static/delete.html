@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DELETE</title>
+</head>
+<body>
+<form onsubmit="return false">
+  <p>
+    <input type="text" name="text">
+    <select id="type">
+      <option>default</option>
+      <option>json</option>
+      <option>formdata</option>
+    </select>
+    <input type="submit">
+  </p>
+</form>
+<p id="result"></p>
+<script type="module">
+  import BSFetch from './js/BSFetch.js'
+  
+  Object.defineProperty(Number.prototype, 'means', {
+    get() {
+      return () => {
+        switch (this) {
+          case 202:
+            return 'will be deleted soon'
+          case 204:
+            return 'deleted'
+          case 200:
+            return 'deleted, received following detail:'
+          default:
+            return 'unknown'
+        }
+      }
+    }
+  })
+  
+  BSFetch.fetch('/delete/msg/default', 'delete', {
+    debug: true,
+    data: {
+      text: 'hello'
+    }
+  }).then(status => {
+    console.log(status.means())
+  })
+  
+  document.forms[0].addEventListener('submit', async () => {
+    const type = document.querySelector('#type').value
+    const response = await BSFetch.delete(`/delete/msg/${type}`, {
+      debug: true,
+      data: new FormData(document.forms[0]),
+      reqtype: document.querySelector('#type').value,
+      restype: 'response'
+    })
+    const status = response.status
+    document.querySelector('#result').innerHTML = status.means()
+    if (status === 200) {
+      response.json().then(json => {
+        document.querySelector('#result').innerHTML += '<br>'
+        document.querySelector('#result').innerHTML += JSON.stringify(json)
+      })
+    }
+  })
+</script>
+</body>
+</html>

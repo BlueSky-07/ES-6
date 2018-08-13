@@ -1,0 +1,42 @@
+// timeline template
+// BSXml v2.1 @BlueSky
+div .timeline .text-center #app {
+  @for({{$timeline}}) {
+    @if({{$index % 2 === 0}}) {
+      div .empty-time-point {
+      }
+      div .time-point .bounceIn {
+        div .time-point-datetime .text-left {
+          @for({{$item.datetime.split('\n')}}) {
+            {{$item}}
+            br
+          }
+        }
+        div .time-point-content .text-right {
+          @for({{$item.content.split('\n')}}) {
+            {{$item}}
+            br
+          }
+        }
+      }
+    }
+    @if({{$index % 2 !== 0}}) {
+      div .time-point .bounceIn {
+        div .time-point-datetime .text-right {
+          @for({{$item.datetime.split('\n')}}) {
+            {{$item}}
+            br
+          }
+        }
+        div .time-point-content .text-left {
+          @for({{$item.content.split('\n')}}) {
+            {{$item}}
+            br
+          }
+        }
+      }
+      div .empty-time-point {
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Header</title>
+</head>
+<body>
+<script type="module">
+  import BSFetch from './js/BSFetch.js'
+  
+  BSFetch.get('/header/get', {
+    restype: 'headers'
+  }).then(headers => {
+    console.log(headers.get('Message-From-Server') || 'fail to receive')
+  })
+  
+  BSFetch.get('/header/read', {
+    restype: 'text',
+    headers: {
+      "Message-From-Client": "this msg was sent from header of request"
+    }
+  }).then(text => {
+    console.log(text)
+  })
+</script>
+</body>
+</html>

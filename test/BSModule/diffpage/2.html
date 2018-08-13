@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BSModule - different page 2</title>
+</head>
+<body>
+<h3>same page, different page 2</h3>
+<button>goto(1)</button>
+<div id="out"></div>
+<script type="module">
+  import BSModule from '//node.com/modules/BSModule.js'
+  
+  const manager = new BSModule({
+    js_root: './'
+  })
+  
+  manager.apply_module()
+  
+  const data = {
+    msg: 'this data is from page 2'
+  }
+  
+  document.querySelector('button').addEventListener(
+      'click',
+      () => {
+        manager.auto('result', {htmlpath: '1.html', data})
+      }
+  )
+</script>
+</body>
+</html>

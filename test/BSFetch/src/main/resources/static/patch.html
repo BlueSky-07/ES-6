@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PATCH</title>
+</head>
+<body>
+<form onsubmit="return false">
+  <p>
+    <input type="text" name="text">
+    <select id="type">
+      <option>default</option>
+      <option>json</option>
+      <option>formdata</option>
+    </select>
+    <input type="submit">
+  </p>
+</form>
+<form onsubmit="return false">
+  <p>
+    <input type="file" name="file">
+    <input type="submit">
+  </p>
+</form>
+<p id="result"></p>
+<script type="module">
+  import BSFetch from './js/BSFetch.js'
+  
+  Object.defineProperty(Number.prototype, 'means', {
+    get() {
+      return () => {
+        switch (this) {
+          case 204:
+            return 'patched'
+          default:
+            return 'unknown'
+        }
+      }
+    }
+  })
+  
+  BSFetch.patch('/patch/msg/default', {
+    debug: true,
+    data: {
+      text: 'hello'
+    }
+  }).then(status => {
+    console.log(status.means())
+  })
+  
+  document.forms[0].addEventListener('submit', () => {
+    const type = document.querySelector('#type').value
+    BSFetch.patch(`/patch/msg/${type}`, {
+      debug: true,
+      data: new FormData(document.forms[0]),
+      reqtype: document.querySelector('#type').value
+    }).then(s => {
+      document.querySelector('#result').innerHTML = s.means()
+    })
+  })
+  
+  document.forms[1].addEventListener('submit', () => {
+    BSFetch.patch('/patch/file', {
+      debug: true,
+      data: new FormData(document.forms[1]),
+      reqtype: 'formdata'
+    }).then(s => {
+      document.querySelector('#result').innerHTML = s.means() + ", check debug info from console of server side"
+    })
+  })
+</script>
+</body>
+</html>
