@@ -19,6 +19,8 @@
 
 4. 页面跳转至 `http://localhost/test/BSModule/diffpage/1.html`，可以看到含有 `{msg: 'this data is from page 2'}` 的信息
 
+----
+
 #### /test/BSModule/router
 
 ##### 目的：
@@ -37,6 +39,8 @@
 
 4. 访问 `http://localhost/test/BSModule/router/index.html`，页面自动从 `/index.html#/` 跳转至 `/#/`
 
+----
+
 #### /test/BSModule/samepage-diffmodules
 
 ##### 目的：测试单页面的不同模块的载入及数据传输
@@ -50,6 +54,8 @@
 3. 点击页面上的 `b` 按钮，可以看到含有 `module_b has been added.` 的提示语，及含有 `{"b":?}` 的数据信息
 
 4. 重复上述操作，得到相应的变化
+
+----
 
 #### /test/BSModule/samepage-diffsrcs
 

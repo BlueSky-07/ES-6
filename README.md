@@ -56,18 +56,6 @@ ihint.me: [https://pages.ihint.me/?BSModule](https://pages.ihint.me/?BSModule)
 
 在 [这里](/test/BSFetch) 有一份完整的由 `Spring Boot (2.0.4)` 搭建的完整后台，包含所有的配套请求的对应后台 API。
 
-##### 运行部署
-
-1. 安装 [JDK 1.8.*](https://www.oracle.com/technetwork/java/javase/downloads/index.html)
-
-2. 安装 [Maven 3.*](http://maven.apache.org/)
-
-3. 在 `/test/BSFetch` 下执行 `mvn spring-boot:run`，等待依赖环境部署完毕
-
-4. 打开浏览器，访问 `http://localhost/?.html`，所有的 `html` 文件位于 `/test/BSFetch/src/main/resources/static` 下
-
-5. 打开浏览器控制台查看结果
-
 #### 文档
 
 github.io: [https://bluesky-07.github.io/?BSFetch](https://bluesky-07.github.io/?BSFetch)
