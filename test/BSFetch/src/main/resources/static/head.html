@@ -10,18 +10,20 @@
 <script type="module">
   import BSFetch from './js/BSFetch.js'
   
-  BSFetch.fetch('text.txt', 'head', {debug: true}).then(headers => {
+  BSFetch.fetch('data/text.txt', 'head', {debug: true}).then(headers => {
     for (const entry of headers.entries()) {
       const [key, value] = entry
       console.log(`${key}: ${value}`)
     }
   })
   
-  BSFetch.fetch('null.txt', 'head', {debug: true}).then(headers => {
+  BSFetch.fetch('data/null.txt', 'head', {debug: true}).then(headers => {
     for (const entry of headers.entries()) {
       const [key, value] = entry
       console.log(`${key}: ${value}`)
     }
+  }).catch(e => {
+    console.log('connot find null.txt')
   })
   
   BSFetch.fetch('/head', 'head', {debug: true}).then(headers => {

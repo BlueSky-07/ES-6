@@ -27,7 +27,7 @@ ihint.me: [https://pages.ihint.me/?BSModule](https://pages.ihint.me/?BSModule)
 ### BSFetch
 
 `Browser-Simple-Fetch`
-`v1.0`
+`v1.1`
 
 [源码](/modules/BSFetch.js)
 [测试](/test/BSFetch)

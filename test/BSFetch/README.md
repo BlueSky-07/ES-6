@@ -1,7 +1,7 @@
 ## BSFetch
 
 `Browser-Simple-Fetch`
-`v1.0`
+`v1.1`
 
 ### 测试
 
@@ -185,7 +185,39 @@
 
 ----
 
-以上所有测试过程中将浏览器开发者工具切换至“网络”标签，查看有关请求的详细信息
+#### global.html
+
+##### 目的：测试`BSFetch`的全局注册与使用
+
+1. 访问 `http://localhost/global.html`
+
+2. 点击 `google.png` 按钮，在浏览器控制台查看到此次请求的 `Request` 及 `Response` 信息，页面载入了一张图片
+
+----
+
+#### error.html
+
+##### 目的：测试`BSFetch`出错时的返回值
+
+1. 访问 `http://localhost/error.html`
+
+2. 在浏览器控制台查看 1 条预设请求的结果和对应的 `Request` 及 `Response` 信息
+
+----
+
+#### prefix.html
+
+##### 目的：测试实例化`BSFetch`的自动添加 URL 前缀
+
+1. 访问 `http://localhost/prefix.html`
+
+2. 点击 `google.png` 按钮，在浏览器控制台查看到此次请求的 `Request` 及 `Response` 信息，页面载入了一张图片
+
+3. 点击 `text.txt` 按钮，在浏览器控制台查看到此次请求的 `Request` 及 `Response` 信息，页面载入了一段文本
+
+----
+
+在以上所有测试过程中可将浏览器开发者工具切换至“网络”标签以查看有关请求的详细信息
 
 ### 文档
 

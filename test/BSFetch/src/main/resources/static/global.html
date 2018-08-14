@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Global</title>
+</head>
+<body>
+<p>
+  <button onclick="showPic()">google.png</button>
+</p>
+<p>
+  <img id="google">
+</p>
+<script type="module">
+  import BSFetch from './js/BSFetch.js'
+  
+  BSFetch.global()
+</script>
+<script>
+  const showPic = () => {
+    if (BSFetch) {
+      BSFetch.get('data/google.png', {
+        debug: true,
+        restype: 'blob'
+      }).then(img => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          document.querySelector('#google').src = reader.result
+        }
+        reader.readAsDataURL(img)
+      })
+    } else {
+      alert('BSFetch has not been registered')
+    }
+  }
+</script>
+</body>
+</html>
