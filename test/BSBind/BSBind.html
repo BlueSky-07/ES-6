@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BSBind</title>
+</head>
+<body>
+<p>storage.listener <span id="listener-symbol">:</span> <input id="listener"></p>
+<p>storage.receiver <span id="receiver-symbol">:</span> <input id="receiver"></p>
+<p>storage.sender <span id="sender-symbol">:</span> <input id="sender"></p>
+<p>storage.data <span id="data-symbol">:</span> <input id="data"></p>
+<script type="module">
+  import BSBind from '//node.com/modules/BSBind.js'
+  
+  const $ = document.querySelector.bind(document)
+  const $$ = document.querySelectorAll.bind(document)
+  
+  const storage = {
+    listener: '', receiver: '', sender: '', data: ''
+  }
+  
+  const inputs = {
+    listener: $('#listener'), receiver: $('#receiver'), sender: $('#sender'), data: $('#data')
+  }
+  
+  const render = () => {
+    Object.keys(storage).forEach(key => {
+      inputs[key].value = key === 'data' ? BSBind.get('data') : storage[key]
+    })
+  }
+  
+  const save = id => {
+    const value = inputs[id].value
+    switch (id) {
+      case 'listener':
+        storage.listener = value
+        break
+      case 'receiver':
+        storage.receiver = value
+        break
+      case 'sender':
+        storage.sender = value
+        break
+      case 'data':
+        BSBind.set('data', value)
+        break
+    }
+    render()
+  }
+  
+  (() => {
+    BSBind.put('data', 'hello')
+    BSBind.bind('data', storage, 'listener')
+    BSBind.bindCopy('data', storage, 'receiver')
+    BSBind.bindBoth('data', storage, 'sender')
+    render()
+    new Array().forEach.call($$('input'), input => {
+      input.addEventListener('click', () => {
+        Object.keys(storage).forEach(key => {
+          $(`#${key}-symbol`).innerHTML = input.id === key ? '=' : ':'
+        })
+      })
+      input.addEventListener('keyup', () => {
+        save(input.id)
+      })
+    })
+  })()
+</script>
+</body>
+</html>

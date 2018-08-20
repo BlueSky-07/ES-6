@@ -61,3 +61,28 @@ ihint.me: [https://pages.ihint.me/?BSModule](https://pages.ihint.me/?BSModule)
 github.io: [https://bluesky-07.github.io/?BSFetch](https://bluesky-07.github.io/?BSFetch)
 
 ihint.me: [https://pages.ihint.me/?BSFetch](https://pages.ihint.me/?BSFetch)
+
+----
+
+### BSBind
+
+`Browser-Simple-DataBind`
+`v0.1`
+
+[源码](/modules/BSBind.js)
+[测试](/test/BSBind)
+
+这是一个关于数据绑定的简单实现。该工具仅用作学习用途，如需在实际环境中使用还需要更多的测试与完善。
+
+
+#### 3 种绑定方式
+
+- 本身可写可读，但源数据更新时会被更新
+- 只读实时源数据
+- 与源数据读写双向绑定
+
+#### 文档
+
+github.io: [https://bluesky-07.github.io/?BSBind](https://bluesky-07.github.io/?BSBind)
+
+ihint.me: [https://pages.ihint.me/?BSBind](https://pages.ihint.me/?BSBind)
