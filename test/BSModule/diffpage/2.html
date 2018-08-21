@@ -14,10 +14,10 @@
   import BSModule from '//node.com/modules/BSModule.js'
   
   const manager = new BSModule({
-    js_root: './'
+    jsRoot: './'
   })
   
-  manager.apply_module()
+  manager.applyModule()
   
   const data = {
     msg: 'this data is from page 2'
@@ -26,7 +26,7 @@
   document.querySelector('button').addEventListener(
       'click',
       () => {
-        manager.auto('result', {htmlpath: '1.html', data})
+        manager.autoHandle('result', {target: '1.html', data})
       }
   )
 </script>

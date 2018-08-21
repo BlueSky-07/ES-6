@@ -21,16 +21,16 @@
   import BSModule from '//node.com/modules/BSModule.js'
   
   const manager = new BSModule({
-    js_root: './'
+    jsRoot: './'
   })
   
-  manager.register_routers([
+  manager.setRouters([
         ['/', 'index'],
         ['/login', 'login']
       ]
   )
   
-  manager.apply_module()
+  manager.applyModule()
   
   new Array().forEach.call(
       document.querySelectorAll('button'),
@@ -38,7 +38,7 @@
         button.addEventListener(
             'click',
             () => {
-              manager.goto(
+              manager.gotoRouter(
                   button.getAttribute('url'),
                   {
                     data: {

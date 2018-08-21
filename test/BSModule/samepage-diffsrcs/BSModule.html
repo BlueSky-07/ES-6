@@ -15,7 +15,7 @@
   import BSModule from '//node.com/modules/BSModule.js'
   
   const manager = new BSModule({
-    js_root: './'
+    jsRoot: './'
   })
   
   const data = {
@@ -27,7 +27,7 @@
       btn.addEventListener('click', () => {
         const path = btn.innerHTML
         data[path]++;
-        manager.auto(
+        manager.autoHandle(
             'module',
             {
               data: Object.assign(data, {_src_: path})

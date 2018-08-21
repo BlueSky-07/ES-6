@@ -1,7 +1,7 @@
 ## BSModule
 
 `Browser-Simple-Module`
-`v1.1`
+`v1.2`
 
 ### 测试
 
@@ -25,7 +25,7 @@
 
 ##### 目的：
 
-1. 测试单页面路由功能
+1. 测试路由功能
 
 2. `index.html` 的强制跳转
 
@@ -70,6 +70,18 @@
 3. 点击页面上的 `b` 按钮，可以看到含有 `module form b.js has been added.` 的提示语，及含有 `{"a":?,"b":?,"_src_":"b"}` 的数据信息
 
 4. 重复上述操作，得到相应的变化
+
+----
+
+#### /test/BSModule/router-patharg
+
+##### 目的：测试带参数路径的路由功能
+
+##### 过程：
+
+1. 访问 `http://localhost/test/BSModule/router_patharg/BSModule.html`
+
+2. 分别点击不同的链接与按钮可以看到相应的数据变化，同时地址也发生变化
 
 ### 文档
 

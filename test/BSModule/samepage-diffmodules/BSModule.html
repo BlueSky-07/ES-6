@@ -18,7 +18,7 @@
   import BSModule from '//node.com/modules/BSModule.js'
   
   const manager = new BSModule({
-    js_root: './'
+    jsRoot: './'
   })
   
   const count = {
@@ -32,7 +32,7 @@
         count[path]++;
         const data = {}
         data[path] = count[path]
-        manager.auto(path, {data: data})
+        manager.autoHandle(path, {data: data})
       })
     })
   }

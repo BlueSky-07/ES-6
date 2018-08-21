@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BSModule - router path arg</title>
+</head>
+<body>
+<div id="page">
+  <p>this is <span id="page_name">index</span> page.</p>
+  <p><a href="#/">#/</a></p>
+  <p><a href="#/hot?sort=latest">#/hot?sort=latest</a></p>
+  <p><a href="#/mv/123">#/mv/123</a></p>
+  <p><a href="#/play/123/456">#/play/123/456</a></p>
+  <p>notice: data in hash will replace data in path:
+    <a href="#/play/123/456?page=another">#/play/123/456?page=another</a></p>
+  <p>#/like/123456/all: <button>like all the song of this singer</button></p>
+</div>
+<div id="data"></div>
+<script type="module">
+  import BSModule from '//node.com/modules/BSModule.js'
+  
+  const manager = new BSModule({
+    jsRoot: './'
+  })
+  
+  manager.setRouters([
+        ['/', 'core'],
+        ['/{page}', 'core'],
+        ['/{page}/{id}', 'core'],
+        ['/{page}/{albumId}/{songId}', 'core'],
+        ['/like/{singerId}/all', 'core'],
+        ['/drop/{this}/router', 'core']
+      ]
+  )
+  
+  document.querySelector('button').addEventListener('click', () => {
+    manager.gotoRouter('/like/123456/all', {
+      page: 'like action'
+    })
+  })
+  
+  manager.removeRouter('/drop/{this}/router')
+  
+  manager.applyModule()
+  
+  BSModule.jumpAtIndex()
+</script>
+</body>
+</html>

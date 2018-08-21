@@ -3,7 +3,7 @@
 ### BSModule
 
 `Browser-Simple-Module`
-`v1.1`
+`v1.2`
 
 [源码](/modules/BSModule.js)
 [测试](/test/BSModule)

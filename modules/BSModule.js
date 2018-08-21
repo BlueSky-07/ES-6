@@ -2,9 +2,9 @@
  * Browser-Simple-Module
  * @BlueSky
  *
- * Version Alpha, 1.1
+ * Version Alpha, 1.2
  *
- * Last updated: 2018/8/10
+ * Last updated: 2018/8/21
  *
  */
 import md5 from './libs/md5.js'
@@ -13,13 +13,15 @@ import BSData from './BSData.js'
 const $ = document.querySelector.bind(document)
 
 class BSModule {
-  constructor({id_prefix = 'js_module_', js_root = 'js/', emptyjs = 'empty.js'} = {}) {
-    this.id_prefix = id_prefix
-    this.js_root = js_root
-    this.emptyjs = `${js_root}${emptyjs}`
+  constructor({idPrefix = 'js_module_', jsRoot = 'js/', emptyJS = 'empty.js'} = {}) {
+    this.idPrefix = idPrefix
+    this.jsRoot = jsRoot
+    this.emptyJS = `${jsRoot}${emptyJS}`
+    
+    this.routers = {}
   }
   
-  static add_js(id, src, {callback = '', type = ''} = {}) {
+  static addJS(id, src, {callback = '', type = ''} = {}) {
     try {
       $(`#${id}`).remove()
     } catch (e) {
@@ -47,93 +49,115 @@ class BSModule {
     document.body.appendChild(newScript)
   }
   
-  add_module(name = '', {src = '', callback = ''} = {}) {
-    BSModule.add_js(`${this.id_prefix}${name}`, `${this.js_root}${src || name}.js`, {callback, type: 'module'})
+  addModule(name = '', {src = '', callback = ''} = {}) {
+    BSModule.addJS(`${this.idPrefix}${name}`, `${this.jsRoot}${src || name}.js`, {callback, type: 'module'})
   }
   
-  add_modules(modules = [], callback = '') {
+  addModules(modules = [], callback = '') {
     for (const module of modules) {
       for (const {name, src} of module) {
-        this.add_module(name, {src})
+        this.addModule(name, {src})
       }
     }
-    BSModule.add_js(`${this.id_prefix}callback`, this.emptyjs, {callback, type: 'module'})
+    BSModule.addJS(`${this.idPrefix}callback`, this.emptyJS, {callback, type: 'module'})
   }
   
   // import module or go to another page
-  auto(module_name = '', {htmlpath = '', data = {}} = {}) {
-    const current_htmlpath = location.pathname
-    const target_htmlpath = htmlpath || current_htmlpath
-    if (current_htmlpath === target_htmlpath) {
-      BSModule.dataStorage[module_name] = data
-      this.apply_module(module_name, true)
+  autoHandle(name = '', {target = '', data = {}} = {}) {
+    const currentPathname = location.pathname
+    const targetPathname = target || currentPathname
+    if (currentPathname === targetPathname) {
+      BSModule.dataStorage[name] = data
+      this.applyModule(name, true)
     } else {
-      const transferring_data = Object.assign(
+      data = Object.assign(
           data, {
-            _from_: current_htmlpath
+            _from_: currentPathname
           }
       )
-      location.href = `${target_htmlpath}#${module_name}?${BSData.object_to_body(transferring_data)}`
+      location.href = `${targetPathname}#${name}?${BSData.object_to_body(data)}`
     }
   }
   
-  apply_module(module_name = '', is_current = false, is_router = false) {
-    if (!is_current) {
-      module_name = (location.hash.split('?')[0] || '').slice(1)
-      if (module_name.startsWith('/')) {
-        const path = module_name
-        try {
-          module_name = this.routers[md5(path)].module_name
-          is_router = true
-        } catch (e) {
-          throw new Error(`router for ${path} must be registered before apply`)
-        }
+  applyModule(name = '', isCurrent = false, isRouter = false) {
+    if (!isCurrent) {
+      name = (location.hash.split('?')[0] || '').slice(1)
+      if (name.startsWith('/')) {
+        const path = name
+        const realPath = this.getRegisteredPath(path)
+        isRouter = true
+        const hash = md5(realPath)
+        name = this.routers[hash].name
+        BSModule.dataStorage[name] = this.getDataFromPath(path, hash)
+      } else {
+        BSModule.dataStorage[name] = {}
       }
-      const raw_data = location.hash.slice(location.hash.split('?')[0].length + 1)
-      BSModule.dataStorage[module_name] = BSData.body_to_object(raw_data) || {}
+      const rawData = location.hash.slice(location.hash.split('?')[0].length + 1)
+      BSModule.dataStorage[name] = Object.assign(BSModule.dataStorage[name], BSData.body_to_object(rawData))
     }
-    if (module_name) {
-      BSModule.lastModuleName = module_name
-      if (is_router) {
-        delete BSModule.dataStorage[module_name]._src_
+    if (name) {
+      BSModule.lastModuleName = name
+      if (isRouter) {
+        delete BSModule.dataStorage[name]._src_
       }
-      const src = BSModule.dataStorage[module_name]._src_ || module_name
-      this.add_module(module_name, {src})
+      const src = BSModule.dataStorage[name]._src_ || name
+      this.addModule(name, {src})
     }
   }
   
-  register_router(path = '', module_name = {}) {
-    if (path[0] !== '/') {
+  setRouter(path = '', name = '', isDelete = false) {
+    path = path.trim()
+    if (!path.startsWith('/')) {
       throw new Error('path must start with /')
     }
-    if (!this.routers) {
-      this.routers = {}
+    
+    const args = []
+    const subpaths = path.slice(1).split('/')
+    for (const subpath of subpaths) {
+      if (subpath.startsWith('{') && subpath.endsWith('}')) {
+        args.push(subpath.slice(1, -1))
+      } else {
+        args.push('')
+      }
     }
+    path = path.replace(/{[^}]*}/g, '...')
     const hash = md5(path)
-    this.routers[hash] = {path, module_name}
-    if (!BSModule.hashchange_event_registered) {
-      BSModule.hashchange_event_registered = true
+    if (this.routers[hash]) {
+      if (isDelete) {
+        this.routers[hash] = undefined
+        return
+      }
+      throw new Error(`${path} has already been registered`)
+    } else {
+      if (isDelete) {
+        throw new Error(`${path} has not been registered `)
+      }
+    }
+    this.routers[hash] = {path, name, args}
+    
+    if (!BSModule.hasHashchangeEventAdded) {
       window.onhashchange = () => {
         if (BSModule.gotoPreventApplyAgain) {
           BSModule.gotoPreventApplyAgain = false
         } else {
-          this.apply_module()
+          this.applyModule()
         }
       }
+      BSModule.hasHashchangeEventAdded = true
     }
   }
   
-  register_routers(routers = []) {
+  setRouters(routers = []) {
     if (Array.isArray(routers)) {
       for (const router of routers) {
         if (Array.isArray(router)) {
-          const [path, module_name] = router
-          this.register_router(path, module_name)
-        } else if (router.path && router.module_name) {
-          const {path, module_name} = router
-          this.register_router(path, module_name)
+          const [path, name] = router
+          this.setRouter(path, name)
+        } else if (router.path && router.name) {
+          const {path, name} = router
+          this.setRouter(path, name)
         } else {
-          throw new Error('item should be [path, module_name] or {path, module_name}')
+          throw new Error('item should be [path, name] or {path, name}')
         }
       }
     } else {
@@ -141,23 +165,73 @@ class BSModule {
     }
   }
   
-  goto(path = '', {data = {}} = {}) {
-    const hash = md5(path)
-    if (this.routers[hash]) {
-      BSModule.gotoPreventApplyAgain = true
-      const module_name = this.routers[hash].module_name
-      BSModule.dataStorage[module_name] = data
-      location.href = `${location.pathname}#${path}`
-      this.apply_module(module_name, true, true)
-    } else {
-      throw new Error(`${path} has not be registered`)
-    }
+  removeRouter(path) {
+    this.setRouter(path, '', true)
   }
   
-  static prevent_index_html({filename = 'index.html', index_path = '/'} = {}) {
-    if (location.pathname.endsWith(filename)) {
-      location.href = `${location.pathname.slice(0, 0 - (filename.length))}#${index_path}`
+  gotoRouter(path = '', data = {}) {
+    BSModule.gotoPreventApplyAgain = true
+    const realPath = this.getRegisteredPath(path)
+    const hash = md5(realPath)
+    const name = this.routers[hash].name
+    BSModule.dataStorage[name] = Object.assign(this.getDataFromPath(path), data)
+    location.href = `${location.pathname}#${path}`
+    this.applyModule(name, true, true)
+  }
+  
+  getDataFromPath(rawPath, hash = '') {
+    const data = {}
+    const rawArgs = rawPath.slice(1).split('/')
+    if (!hash) {
+      hash = md5(this.getRegisteredPath(rawPath))
     }
+    const registeredArgs = this.routers[hash].args
+    for (let i = 0; i < registeredArgs.length; i++) {
+      const rawArg = rawArgs[i]
+      const registeredArg = registeredArgs[i]
+      if (rawArg && registeredArg) {
+        data[registeredArg] = rawArg
+      }
+    }
+    return data
+  }
+  
+  getRegisteredPath(rawPath) {
+    const iterator = getPathIterator(rawPath)
+    let {value, done} = iterator.next()
+    let foundPath = ''
+    while (!done) {
+      if (this.routers[md5(value)]) {
+        foundPath = value
+        break
+      }
+      ({value, done} = iterator.next())
+    }
+    if (!foundPath) {
+      throw new Error(`${rawPath} has not been registered`)
+    }
+    return foundPath
+  }
+  
+  static jumpAtIndex({filename = 'index.html', indexPath = '/'} = {}) {
+    if (location.pathname.endsWith(filename)) {
+      location.href = `${location.pathname.slice(0, 0 - (filename.length))}#${indexPath}`
+    }
+  }
+}
+
+function* getPathIterator(path) {
+  const subpaths = path.slice(1).split('/')
+  let pattern = 2 ** subpaths.length - 1
+  while (pattern >= 0) {
+    let pat = pattern
+    const result = []
+    for (let i = subpaths.length - 1; i >= 0; i--) {
+      result.push(pat & 1 ? subpaths[i] : '...')
+      pat >>= 1
+    }
+    yield '/' + result.reduce((total, current) => current + '/' + total)
+    pattern--
   }
 }
 
