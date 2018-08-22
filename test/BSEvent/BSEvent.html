@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BSEvent</title>
+  <style>
+    textarea {
+      width: 300px;
+      height: 300px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+<p>message: <input id="message"> <button id="print">emit('message')</button></p>
+<p>a: <input id="a"> b: <input id="b"> <button id="calc">emit('calc')</button></p>
+<textarea id="result-message">
+result of message:
+
+</textarea>
+<textarea id="result-calc">
+result of calc:
+
+</textarea>
+<script type="module">
+  import BSEvent from '//node.com/modules/BSEvent.js'
+  
+  const $ = document.querySelector.bind(document)
+  const emitter = new BSEvent('myEmitter')
+  
+  const funs = {
+    success: () => {
+      console.log('success')
+    },
+    drop: () => {
+      console.log('this message should not been printed again')
+    },
+    print: str => {
+      $('#result-message').value += (str || 'EMPTY') + '\n'
+    },
+    add: (a, b) => {
+      $('#result-calc').value += `${a} + ${b} = ${Number(a) + Number(b)}\n`
+    },
+    minus: (a, b) => {
+      $('#result-calc').value += `${a} - ${b} = ${Number(a) - Number(b)}\n`
+    },
+    multiply: (a, b) => {
+      $('#result-calc').value += `${a} * ${b} = ${Number(a) * Number(b)}\n`
+    },
+    divide: (a, b) => {
+      $('#result-calc').value += `${a} / ${b} = ${Number(a) / Number(b)}\n`
+    },
+  }
+  
+  emitter.once('message', funs.success)
+  emitter.on('message', funs.print)
+  emitter.on('message', funs.drop)
+  
+  emitter.emit('message')
+  
+  emitter.remove('message', funs.drop)
+  
+  $('#print').addEventListener('click', () => {
+    BSEvent.myEmitter.emit('message', $('#message').value)
+  })
+  
+  emitter.on('calc', funs.add)
+  emitter.on('calc', funs.minus)
+  emitter.on('calc', funs.multiply)
+  emitter.on('calc', funs.divide)
+  emitter.emit('calc', 1, 2)
+
+  $('#calc').addEventListener('click', () => {
+    emitter.emit('calc', $('#a').value, $('#b').value)
+  })
+</script>
+</body>
+</html>
