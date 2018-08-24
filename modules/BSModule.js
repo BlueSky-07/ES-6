@@ -2,9 +2,9 @@
  * Browser-Simple-Module
  * @BlueSky
  *
- * Version Alpha, 1.2
+ * Version Alpha, 1.3
  *
- * Last updated: 2018/8/21
+ * Last updated: 2018/8/23
  *
  */
 import md5 from './libs/md5.js'
@@ -70,7 +70,7 @@ class BSModule {
       BSModule.dataStorage[name] = data
       this.applyModule(name, true)
     } else {
-      data = Object.assign(
+      Object.assign(
           data, {
             _from_: currentPathname
           }
@@ -93,7 +93,7 @@ class BSModule {
         BSModule.dataStorage[name] = {}
       }
       const rawData = location.hash.slice(location.hash.split('?')[0].length + 1)
-      BSModule.dataStorage[name] = Object.assign(BSModule.dataStorage[name], BSData.body_to_object(rawData))
+      Object.assign(BSModule.dataStorage[name], BSData.body_to_object(rawData))
     }
     if (name) {
       BSModule.lastModuleName = name

@@ -3,7 +3,7 @@
 ### BSModule
 
 `Browser-Simple-Module`
-`v1.2`
+`v1.3`
 
 [源码](/modules/BSModule.js)
 [测试](/test/BSModule)
@@ -86,3 +86,29 @@ ihint.me: [https://pages.ihint.me/?BSFetch](https://pages.ihint.me/?BSFetch)
 github.io: [https://bluesky-07.github.io/?BSBind](https://bluesky-07.github.io/?BSBind)
 
 ihint.me: [https://pages.ihint.me/?BSBind](https://pages.ihint.me/?BSBind)
+
+----
+
+### BSXml
+
+`Browser-Slim-XML`
+`v3.0`
+
+[源码](/modules/BSXml)
+[测试](/test/BSXml)
+
+这是一个关于模版引擎渲染、事件注册、输入框双向绑定的简单实现。该工具仅用作学习用途，如需在实际环境中使用还需要更多的测试与完善。
+
+----
+
+### BSXml-Lite
+
+`Browser-Slim-XML-Renderer`
+`v2.3`
+
+[源码](/modules/BSXmlLite.js)
+[测试](/test/BSXmlLite)
+
+这是一个关于模版引擎渲染、事件注册、输入框双向绑定的简单实现。该工具仅用作学习用途，如需在实际环境中使用还需要更多的测试与完善。
+
+*Lite 版将不再更新，此版本功能实现与 BSXml v3.0 完全一致*

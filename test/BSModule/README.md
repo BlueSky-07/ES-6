@@ -1,7 +1,7 @@
 ## BSModule
 
 `Browser-Simple-Module`
-`v1.2`
+`v1.3`
 
 ### 测试
 

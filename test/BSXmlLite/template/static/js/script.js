@@ -1,4 +1,4 @@
-import BSXml from "//node.com/modules/BSXml/BSXml.js"
+import BSXml from "//node.com/modules/BSXmlLite.js"
 
 const $ = document.querySelector.bind(document)
 const $$ = document.querySelectorAll.bind(document)

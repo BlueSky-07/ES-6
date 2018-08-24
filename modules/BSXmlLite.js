@@ -1,17 +1,16 @@
 /**
- * Browser-Slim-XML
+ * Browser-Slim-XML-Renderer
  * @BlueSky
  *
- * Version Alpha, 2.2
+ * Version Alpha, 2.3
+ * Based on BSXml v3.0
  *
- * Last updated: 2018/8/7
+ * Last updated: 2018/8/24
  *
  */
 
 import md5 from './libs/md5.js'
-
-const $ = document.querySelector.bind(document)
-const $$ = document.querySelectorAll.bind(document)
+import BSFetch from './BSFetch.js'
 
 class El {
   constructor(tagName = '', props = {}, children = []) {
@@ -22,12 +21,12 @@ class El {
   
   render() {
     const el = document.createElement(this.tagName)
-    const props = this.props
     
-    for (const propName in props) {
-      const propValue = props[propName]
-      if (!propValue) continue
-      el.setAttribute(propName, propValue)
+    for (const prop of Object.entries(this.props)) {
+      const [key, value] = prop
+      if (value) {
+        el.setAttribute(key, value)
+      }
     }
     
     const children = this.children || []
@@ -46,14 +45,11 @@ class El {
 
 class BSXml {
   static start(
-      templateNodes = [],
-      {
+      templateNodes = [], {
         dataset = {},
         functions = {},
-        init = () => {
-        },
-        next = () => {
-        }
+        init = new Function(),
+        next = new Function()
       } = {}) {
     
     if (init instanceof Function) {
@@ -62,83 +58,33 @@ class BSXml {
       throw new Error('init should be a function')
     }
     
-    if (!next instanceof Function) {
+    if (!(next instanceof Function)) {
       throw new Error('next should be a function')
-    }
-    // add some functions into next for registering events and inputs
-    let NEXT = () => {
-      // register events
-      new Array().forEach.call(
-          $$('BSXml-Event'),
-          mark => {
-            const target = mark.parentNode
-            const eventName = mark.getAttribute('eventName')
-            const functionName = mark.getAttribute('functionName')
-            if (Object.keys(functions).includes(functionName)) {
-              target.addEventListener(
-                  eventName,
-                  () => {
-                    functions[functionName].call(functions, window.event, target, dataset)
-                  }
-              )
-              mark.remove()
-            } else {
-              throw new Error(`cannot find a function named ${functionName}`)
-            }
-          }
-      )
-      
-      // register inputs
-      new Array().forEach.call(
-          $$('BSXml-Input'),
-          mark => {
-            const target = mark.nextElementSibling
-            const inputName = `${(target.getAttribute('name') || new Date().getTime())}`
-            const hash = md5(inputName)
-            target.setAttribute('md5', hash)
-            Object.defineProperty(
-                BSXml.inputs,
-                inputName,
-                {
-                  enumerable: true,
-                  get() {
-                    const hash = md5(inputName)
-                    return BSXml.__inputs__[hash].value
-                  },
-                  set(value) {
-                    const hash = md5(inputName)
-                    BSXml.__inputs__[hash].value = value
-                  }
-                }
-            )
-            BSXml.__inputs__[hash] = target
-            BSXml.inputs[inputName] = ''
-            mark.remove()
-          }
-      )
-      
-      // user's next function
-      next()
-    }
-    
-    // generate NEXT.next() function
-    // real next() will be called after all templateNodes have been showRendered
-    for (let i = 0; i < templateNodes.length; i++) {
-      NEXT = {
-        NEXT,
-        next() {
-          if (this.NEXT.NEXT) {
-            this.NEXT = this.NEXT.NEXT
-          } else {
-            this.NEXT()
-          }
-        }
-      }
     }
     
     // call showRendered for each templateNode
     if (Array.isArray(templateNodes)) {
-      [].forEach.call(
+      let NEXT = () => {
+        // user's next function
+        next()
+      }
+  
+      // generate NEXT.next() function
+      // real next() will be called after all templateNodes have been showRendered
+      for (let i = 0; i < templateNodes.length; i++) {
+        NEXT = {
+          NEXT,
+          next() {
+            if (this.NEXT.NEXT) {
+              this.NEXT = this.NEXT.NEXT
+            } else {
+              this.NEXT()
+            }
+          }
+        }
+      }
+      
+      new Array().forEach.call(
           templateNodes,
           async templateNode => {
             if (templateNode) {
@@ -159,54 +105,27 @@ class BSXml {
               }
               
               // fetch template (.bsx file)
-              if (realTemplateNode.getAttribute('link')) {
+              if (realTemplateNode.getAttribute('link') && !realTemplateNode.getAttribute('ignore-link')) {
                 const link = realTemplateNode.getAttribute('link').trim()
-                await fetch(link)
-                    .then(
-                        r => {
-                          if (r.ok) {
-                            return r.text()
-                          } else {
-                            throw new Error(`cannot fetch template from ${link}`)
-                          }
-                        }
-                    )
-                    .then(
-                        text => {
-                          realTemplateNode.innerHTML = text
-                        }
-                    )
-                    .catch(
-                        e => {
-                          throw e
-                        }
-                    )
+                await BSFetch.get(link, {
+                  restype: 'text'
+                }).then(text => {
+                  realTemplateNode.innerHTML = text
+                }).catch(() => {
+                  throw new Error(`cannot fetch template from ${link}`)
+                })
+                realTemplateNode.setAttribute('ignore-link', 'true')
               }
               
               // fetch dataset
               let realDataset = {}
               if (realTemplateNode.getAttribute('data')) {
                 const data = realTemplateNode.getAttribute('data').trim()
-                await fetch(data)
-                    .then(
-                        r => {
-                          if (r.ok) {
-                            return r.json()
-                          } else {
-                            throw new Error(`cannot fetch dataset from ${data}`)
-                          }
-                        }
-                    )
-                    .then(
-                        json => {
-                          realDataset = json
-                        }
-                    )
-                    .catch(
-                        e => {
-                          throw e
-                        }
-                    )
+                await BSFetch.get(data).then(json => {
+                  realDataset = json
+                }).catch(() => {
+                  throw new Error(`cannot fetch dataset from ${data}`)
+                })
               }
               
               // work
@@ -218,7 +137,7 @@ class BSXml {
                           dataset
                       )
                   ),
-                  realTemplateNode
+                  realTemplateNode, functions, dataset
               )
               
               // call NEXT.next()
@@ -231,18 +150,65 @@ class BSXml {
   }
 }
 
-const showRendered = (vdRoot, templateNode) => {
-  if (!templateNode instanceof HTMLElement || !vdRoot instanceof HTMLElement) {
-    throw new Error('illegal call')
-  }
-  
+const showRendered = (vdRoot, templateNode, functions, dataset) => {
   // insert before templateNode
   const parentNode = templateNode.parentNode
-  const leftNodesToInsert = vdRoot.render().children
-  while (leftNodesToInsert.length > 0) {
-    parentNode.insertBefore(leftNodesToInsert[0], templateNode)
-  }
+  const domNodes = vdRoot.render()
+  const fragment = document.createDocumentFragment()
+  new Array().forEach.call(domNodes.children, element => {
+    fragment.appendChild(element)
+  })
   
+  // register events
+  new Array().forEach.call(
+      fragment.querySelectorAll('BSXml-Event'),
+      mark => {
+        const target = mark.parentNode
+        const eventName = mark.getAttribute('eventName')
+        const functionName = mark.getAttribute('functionName')
+        if (Object.keys(functions).includes(functionName)) {
+          target.addEventListener(
+              eventName,
+              () => {
+                functions[functionName].call(functions, window.event, target, dataset, BSXml.inputs)
+              }
+          )
+          mark.remove()
+        } else {
+          throw new Error(`cannot find a function named ${functionName}`)
+        }
+      }
+  )
+  
+  // register inputs
+  new Array().forEach.call(
+      fragment.querySelectorAll('BSXml-Input'),
+      mark => {
+        const target = mark.nextElementSibling
+        const inputName = `${(target.getAttribute('name') || new Date().getTime())}`
+        const hash = md5(inputName)
+        target.setAttribute('md5', hash)
+        Object.defineProperty(
+            BSXml.inputs,
+            inputName, {
+              enumerable: true,
+              get() {
+                const hash = md5(inputName)
+                return BSXml.__inputs__[hash].value
+              },
+              set(value) {
+                const hash = md5(inputName)
+                BSXml.__inputs__[hash].value = value
+              }
+            }
+        )
+        BSXml.__inputs__[hash] = target
+        BSXml.inputs[inputName] = ''
+        mark.remove()
+      }
+  )
+  
+  parentNode.insertBefore(fragment, templateNode)
   // keep or remove templateNode
   if (templateNode.getAttribute('keep') !== 'true') {
     parentNode.removeChild(templateNode)
@@ -285,15 +251,11 @@ const generateVirtualDOM = (template = '', dataset = {}) => {
       }
       try {
         const loopTemplate = getTemplateOfBlock(i, lines)
-        const back = new Map()
-        back.index = dataset.index
-        back.item = dataset.item
         for (let index = 0; index < loopTarget.length; index++) {
           generateVirtualDOM(
               loopTemplate.join('\n'),
-              Object.assign(
-                  dataset,
-                  {
+              Object.assign({},
+                  dataset, {
                     index, item: loopTarget[index]
                   }
               )
@@ -303,8 +265,6 @@ const generateVirtualDOM = (template = '', dataset = {}) => {
               }
           )
         }
-        back.index ? (dataset.index = back.index) : null
-        back.item ? (dataset.item = back.item) : null
         i += loopTemplate.length + 1
         continue
       } catch (e) {
@@ -341,7 +301,7 @@ const generateVirtualDOM = (template = '', dataset = {}) => {
         throw new Error(`cannot find the end of condition, first line is: ${line.replace(/dataset[.]/g, '$')}`)
       }
     }
-  
+    
     // read data from dataset
     try {
       line = line.replace(
@@ -489,7 +449,7 @@ const setElSpecialProps = (element, raw = '') => {
       props.href = (raw.match(/"[^]*"/) || [''])[0].slice(1, -1)
       if (raw.includes('*"')) props.target = '_blank'
     }
-    element.props = Object.assign(element.props, props)
+    Object.assign(element.props, props)
   }
 }
 
@@ -497,13 +457,13 @@ const setElProps = (element, key = '', value = '') => {
   if (element instanceof El) {
     const props = {}
     props[key] = value
-    element.props = Object.assign(element.props, props)
+    Object.assign(element.props, props)
   }
 }
 
 const getTemplateNode = (name = '') => {
   if (name.trim().length > 0) {
-    return $(`BSX[name=${name}]`)
+    return document.querySelector(`BSX[name=${name}]`)
   } else {
     return null
   }
@@ -515,7 +475,7 @@ const getTemplateOfBlock = (indexOfCurrent = -1, lines = []) => {
     left: 0, right: 0
   }
   for (let i = indexOfCurrent + 1; i < lines.length; i++) {
-    const line = lines[i]
+    const line = lines[i].trim()
     if (line.endsWith('{') && !line.endsWith('{{')) {
       countOfBrackets.left++
     } else if (line.endsWith('}') && !line.endsWith('}}')) {
@@ -535,6 +495,6 @@ const getTemplateOfBlock = (indexOfCurrent = -1, lines = []) => {
 }
 
 BSXml.inputs = Object.create(null)
-BSXml.__inputs__ = new Map()
+BSXml.__inputs__ = Object.create(null)
 
 export default BSXml
