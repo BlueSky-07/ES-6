@@ -80,6 +80,14 @@ export default class Parser {
               throw new Error(`cannot calculate the result of ${reg.replace(/dataset[.]/g, '$')}`)
             }
           })
+  
+  
+      // Component
+      if (line.startsWith('@')) {
+        const [component, name] = line.slice(1).split(' ').filter(i => i.length > 0)
+        child.children.push(BSElement.createComponentMark(component, name))
+        continue
+      }
       
       
       // set attributes

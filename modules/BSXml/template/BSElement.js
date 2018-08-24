@@ -46,6 +46,10 @@ export default class BSElement {
   static createInputMark() {
     return new BSElement('BSXml-Input')
   }
+  
+  static createComponentMark(component, name) {
+    return new BSElement('BSXml-Component', {component, name})
+  }
 }
 
 // HTML tags reference

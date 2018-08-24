@@ -17,6 +17,7 @@ export default class Renderer {
     this._dataStorage_ = new Map()
     this.inputs = {}
     this._inputs_ = new Map()
+    this.component = null
     
     Object.entries(this.dataset).forEach(([key, value]) => {
       Object.defineProperty(this.dataset, key, {
@@ -51,7 +52,15 @@ export default class Renderer {
             target.addEventListener(
                 eventName,
                 () => {
-                  this.functions[functionName].call(this.functions, window.event, target, this.dataset, this.inputs)
+                  this.functions[functionName].call(
+                      this.functions, {
+                        event: window.event,
+                        target,
+                        dataset: this.dataset,
+                        inputs: this.inputs,
+                        component: this.component,
+                        $this: this.component
+                      })
                 }
             )
             mark.remove()
@@ -96,15 +105,32 @@ Object.defineProperty(
     DocumentFragment.prototype,
     'paint', {
       get() {
-        return (target, type = 'insert-before') => {
+        return (target, type = 'before') => {
           if (!(target instanceof HTMLElement)) {
             throw new Error('target should be an instance of HTMLElement')
           }
           switch (type) {
-            case 'insert-before':
+            case 'before':
               target.parentNode.insertBefore(this, target)
               break
-            case 'append-child':
+            case 'after':
+              if (target.nextElementSibling) {
+                target.parentNode.insertBefore(this, target.nextElementSibling)
+              } else {
+                target.parentNode.appendChild(this)
+              }
+              break
+            case 'replace':
+              target.parentNode.replaceChild(this, target)
+              break
+            case 'push':
+              if (target.children[0]) {
+                target.insertBefore(this, target.children[0])
+              } else {
+                target.appendChild(this)
+              }
+              break
+            case 'append':
               target.appendChild(this)
               break
           }

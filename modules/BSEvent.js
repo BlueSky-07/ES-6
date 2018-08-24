@@ -2,9 +2,9 @@
  * Browser-Simple-EventEmitter
  * @BlueSky
  *
- * Version Alpha, 0.1
+ * Version Alpha, 0.2
  *
- * Last updated: 2018/8/22
+ * Last updated: 2018/8/24
  *
  */
 
@@ -66,25 +66,25 @@ class BSEvent {
   }
   
   emit(name = '', ...args) {
-    try {
+    if (this.events[name]) {
       this.events[name].handle(args)
-    } catch (e) {
+    } else {
       throw new Error(`${name} has not been registered`)
     }
   }
   
   remove(name, callback) {
-    try {
+    if (this.events[name]) {
       this.events[name].remove(callback)
-    } catch (e) {
+    } else {
       throw new Error(`${name} has not been registered`)
     }
   }
   
   clear(name) {
-    try {
+    if (this.events[name]) {
       this.events[name].clear()
-    } catch (e) {
+    } else {
       throw new Error(`${name} has not been registered`)
     }
   }

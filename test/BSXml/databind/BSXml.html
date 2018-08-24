@@ -48,12 +48,12 @@
   
   BSXml.start(['test'], {
     functions: {
-      typed(event, target, dataset, inputs) {
+      typed({inputs}) {
         $('#out').innerText = inputs.test || '未输入'
-      }, success(event, target, dataset, inputs) {
+      }, success({inputs}) {
         inputs.test = 'success'
-        this.typed(event, target, dataset, inputs)
-      }, show(event, target, dataset, inputs) {
+        this.typed({inputs})
+      }, show({inputs}) {
         Object.entries(inputs).forEach(([name, value]) => {
           console.log(`${name}: ${value}`)
         })

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>component</title>
+</head>
+<body>
+<div id="root">
+  <h3>intro</h3>
+</div>
+<script type="module">
+  import BSComponent from '//node.com/modules/BSXml/component/BSComponent.js'
+  
+  class Button extends BSComponent {
+    constructor() {
+      super({
+        template: `
+          button {
+            !click hit
+            hit {{$name}}
+          }
+        `, dataset: {
+          count: 0,
+          name: ''
+        }, functions: {
+          hit({dataset, $this}) {
+            dataset.count++
+            console.log(`hit ${dataset.count} time${dataset.count > 1 ? 's' : ''}`)
+            $this.notify({
+              signal: 'greet', last: new Date()
+            })
+          }
+        }
+      })
+    }
+  }
+  
+  class Page extends BSComponent {
+    constructor() {
+      super({
+        template: `
+          div #page {
+            h3 #greeting {
+              {{$greeting}}
+            }
+            @Button {{$button}}
+          }
+        `, dataset: {
+          greeting: 'unset',
+          button: 'btn'
+        }, functions: {
+          greet({$this}) {
+            const count = $this.components.btn.dataset.count
+            $this.dataset.greeting = `worked again for ${count} time${count > 1 ? 's' : ''}`
+            this.render()
+          },
+          render: () => {
+            document.querySelector('#greeting').innerText = this.dataset.greeting
+          }
+        }, need: {
+          Button
+        }, listen: {
+          greet: ({last}) => {
+            console.log('last hit at ' + last.toLocaleString())
+            this.functions.greet({$this:this})
+          }
+        }
+      })
+    }
+  }
+  
+  new Page().read({
+    greeting: 'BSXml component worked!'
+  }).plug({
+    btn: new Button().read({
+      name: 'me'
+    })
+  }).paint(document.querySelector('#root'), 'append')
+</script>
+</body>
+</html>
