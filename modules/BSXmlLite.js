@@ -2,10 +2,9 @@
  * Browser-Slim-XML-Renderer
  * @BlueSky
  *
- * Version Alpha, 2.4
- * Based on BSXml v3.0
+ * Version Alpha, 2.5
  *
- * Last updated: 2018/8/25
+ * Last updated: 2018/8/27
  *
  */
 
@@ -155,8 +154,8 @@ const showRendered = (vdRoot, templateNode, functions, dataset) => {
   const parentNode = templateNode.parentNode
   const domNodes = vdRoot.render()
   const fragment = document.createDocumentFragment()
-  while (domNodes.children[0]) {
-    fragment.appendChild(domNodes.children[0])
+  while (domNodes.childNodes[0]) {
+    fragment.appendChild(domNodes.childNodes[0])
   }
   
   // register events
@@ -185,7 +184,7 @@ const showRendered = (vdRoot, templateNode, functions, dataset) => {
       fragment.querySelectorAll('BSXml-Input'),
       mark => {
         const target = mark.nextElementSibling
-        const inputName = `${(target.getAttribute('name') || new Date().getTime())}`
+        const inputName = `${(target.getAttribute('dict') || new Date().getTime())}`
         const hash = md5(inputName)
         target.setAttribute('md5', hash)
         Object.defineProperty(

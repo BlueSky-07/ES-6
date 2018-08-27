@@ -47,8 +47,12 @@ export default class BSElement {
     return new BSElement('BSXml-Input')
   }
   
-  static createComponentMark(component, name) {
-    return new BSElement('BSXml-Component', {component, name})
+  static createComponentMark(component, name, args) {
+    return new BSElement('BSXml-Component', {component, name, args})
+  }
+  
+  static createComponentBlockMark(hash) {
+    return new BSElement('bsxc', {hash})
   }
 }
 

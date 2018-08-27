@@ -2,15 +2,15 @@
  * Browser-Slim-XML
  * @BlueSky
  *
- * Version Alpha, 3.2
+ * Version Alpha, 3.3
  *
- * Last updated: 2018/8/24
+ * Last updated: 2018/8/27
  *
  */
 
-import BSXmlCore from './core/core.js'
-import TemplateLoader from './loader/TemplateLoader.js'
-import DataLoader from './loader/DataLoader.js'
+import Parser from './template/Parser.js'
+import Renderer from './template/Renderer.js'
+import BSFetch from '../BSFetch.js'
 
 export default class BSXml {
   static start(
@@ -78,12 +78,12 @@ export default class BSXml {
               }
               
               // fetch template (.bsx file)
-              await TemplateLoader.load(realTemplateNode)
+              await TmplLoader.load(realTemplateNode)
               
               // fetch dataset
               let realDataset = await DataLoader.load(realTemplateNode) || {}
               
-              BSXmlCore.run(realTemplateNode.innerHTML, realTemplateNode, {
+              run(realTemplateNode.innerHTML, realTemplateNode, {
                 dataset: Object.assign(
                     realDataset,
                     dataset
@@ -95,6 +95,52 @@ export default class BSXml {
               })
             }
           })
+    }
+  }
+}
+
+const run = (
+    template, target, {
+      dataset = {},
+      functions = {},
+      init = new Function(),
+      next = new Function()
+    } = {}) => {
+  
+  const parser = new Parser(template)
+  const renderer = new Renderer(parser, {
+    dataset, functions
+  })
+  init()
+  renderer.render().paint(target)
+  next()
+}
+
+class TmplLoader {
+  static async load(realTemplateNode) {
+    if (realTemplateNode.getAttribute('link') && !realTemplateNode.getAttribute('ignore-link')) {
+      const link = realTemplateNode.getAttribute('link').trim()
+      await BSFetch.get(link, {
+        restype: 'text'
+      }).then(text => {
+        realTemplateNode.innerHTML = text
+      }).catch(() => {
+        throw new Error(`cannot fetch template from ${link}`)
+      })
+      realTemplateNode.setAttribute('ignore-link', 'true')
+    }
+  }
+}
+
+class DataLoader {
+  static async load(realTemplateNode) {
+    if (realTemplateNode.getAttribute('data')) {
+      const data = realTemplateNode.getAttribute('data').trim()
+      try {
+        return await BSFetch.get(data)
+      } catch (e) {
+        throw new Error(`cannot fetch dataset from ${data}`)
+      }
     }
   }
 }

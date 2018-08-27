@@ -11,14 +11,31 @@
   <h3>intro</h3>
 </div>
 <script type="module">
-  import BSComponent from '//node.com/modules/BSXml/component/BSComponent.js'
+  import BSComponent from '//node.com/modules/BSXml/BSComponent.js'
+  
+  class Log extends BSComponent {
+    constructor() {
+      super()
+      this.template = `
+        recent {{$logs.length}} log{{$logs.length > 1 ? 's' : ''}}:
+        @for({{$logs}}) {
+          p {
+            {{$item}}
+          }
+        }
+      `
+      this.dataset = {
+        logs: []
+      }
+    }
+  }
   
   class Input extends BSComponent {
     constructor() {
       super()
       this.template = `
         input {
-          ~ name {{$name}}
+          ~ dict {{$name}}
           ~ placeholder {{$placeholder}}
           ! click clear
           ! keyup typed
@@ -90,9 +107,12 @@
                 {{$greeting}}
               }
             }
-            @Input username
-            @Input message
-            @Button {{$button}}
+            div {
+              @Input username
+              @Input message
+              @Button {{$button}}
+            }
+            @Log logs
           }
         `
       this.dataset = {
@@ -111,14 +131,14 @@
           document.querySelector('#greeting').innerText = this.dataset.greeting
         },
         printLogs: () => {
-          console.log('recent 3 logs:')
-          this.context.logs.slice(-3).forEach(({count, time}) => {
-            console.log(`${count}: ${time.toLocaleString()}`)
-          })
+          this.components.logs.dataset.logs = this.context.logs.slice(-3).map(({count, time}) =>
+            `${count}: ${time.toLocaleString()}`
+          )
+          this.components.logs.refresh()
         }
       }
       this.need = {
-        Button, Input
+        Button, Input, Log
       }
       this.listen = {
         greet: ({last}) => {

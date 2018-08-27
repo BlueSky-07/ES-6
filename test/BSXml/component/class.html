@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Class</title>
+</head>
+<body>
+<div id="app">
+  Welcome
+</div>
+<script type="module">
+  import BSComponent from '//node.com/modules/BSXml/BSComponent.js'
+  
+  const $ = document.querySelector.bind(document)
+  
+  class Student extends BSComponent {
+    constructor(name = 'unset', grade = 0) {
+      super()
+      this.template = `
+        div .student {
+          p {
+            name:
+            
+            input {
+              ~ dict name
+              ~ value {{$name}}
+            }
+          }
+          p {
+            grade:
+            
+            input {
+              ~ dict grade
+              ~ type number
+              ~ value {{$grade}}
+            }
+          }
+        }
+      `
+      this.dataset = {
+        name, grade
+      }
+    }
+    
+    refresh(name, grade, id = -1) {
+      this.inputs.name = name
+      this.inputs.grade = grade
+      this.id = id === -1 ? undefined : id
+    }
+  }
+  
+  class Button extends BSComponent {
+    constructor(name = '', signal = '', ...args) {
+      super()
+      this.template = `
+        button {
+          ! click clicked
+          {{$name}}
+        }
+      `
+      this.functions = {
+        clicked({$this}) {
+          $this.notify({
+            signal: signal || name, args
+          })
+        }
+      }
+      this.dataset = {
+        name: name || 'button'
+      }
+    }
+    
+    refresh() {
+      this.$el('button').innerText = this.name
+    }
+  }
+  
+  class Row extends BSComponent {
+    constructor(item = '', id = 0) {
+      super()
+      item = JSON.parse(item)
+      this.template = `
+        @if({{!$deleted}}) {
+          p {
+            span #info {
+              {{$id}} - {{$name}}: {{$grade}}
+            }
+            
+            @Button update-{{$id}} update{{$id}} update {{$id}}
+            
+            @Button delete-{{$id}} delete{{$id}} delete {{$id}}
+          }
+        }
+      `
+      this.dataset = {
+        name: item.name, grade: item.grade, deleted: item.deleted, id
+      }
+      this.listen = {
+        update: ({args}) => {
+          const id = args[0]
+          this.notify({
+            signal: 'update', id, name: item.name, grade: item.grade
+          })
+        }, delete: ({args}) => {
+          const id = args[0]
+          this.notify({
+            signal: 'delete', id
+          })
+        }
+      }
+      this.need = {
+        Button
+      }
+    }
+    
+    refresh(type, ...args) {
+      switch (type) {
+        case 'delete':
+          this.el.hidden = 'hidden'
+          break
+        case 'update':
+          const student = args[0]
+          this.dataset.name = student.name
+          this.dataset.grade = student.grade
+          this.$el('#info').innerText = `${this.dataset.id} - ${this.dataset.name}: ${this.dataset.grade}`
+          break
+        default:
+          super.refresh()
+      }
+    }
+  }
+  
+  class Table extends BSComponent {
+    constructor(students = []) {
+      super()
+      this.template = `
+        div #table {
+          @for({{$students}}) {
+            @Row row-{{$index}} {{JSON.stringify($item)}} {{$index}}
+          }
+        }
+      `
+      this.dataset = {
+        students
+      }
+      this.listen = {
+        update: (signal) => {
+          this.notify(signal)
+        }, delete: ({id}) => {
+          this.dataset.students[id].deleted = true
+          this.components['row-' + id].refresh('delete')
+        }
+      }
+      this.need = {
+        Row
+      }
+    }
+    
+    refresh(type, ...args) {
+      switch (type) {
+        case 'update': {
+          const id = args[0]
+          const student = args[1]
+          this.components['row-' + id].refresh('update', student)
+          break
+        }
+        case 'insert': {
+          const student = args[0]
+          const id = this.dataset.students.push(student) - 1
+          const row = this.needComponent('Row', 'row-' + id, JSON.stringify(student), id)
+          row.paint(this.el, 'append')
+          break
+        }
+        default:
+          super.refresh()
+      }
+    }
+  }
+  
+  class Panel extends BSComponent {
+    constructor() {
+      super()
+      this.template = `
+        div #panel {
+          div #edit {
+            ~ hidden {{$isHit ? '' : 'hidden'}}
+            @Student student
+            @Button saveBtn save
+          }
+          div #btns {
+            ~ hidden {{!$isHit ? '' : 'hidden'}}
+            @Button addBtn add
+          }
+        }
+      `
+      this.dataset = {
+        isHit: false
+      }
+      this.listen = {
+        add: () => {
+          this.dataset.isHit = true
+          this.components.student.read({id: undefined}).refresh('unset', 0)
+          this.refresh()
+        }, save: () => {
+          this.dataset.isHit = false
+          this.notify({
+            signal: 'save', student: {
+              id: this.components.student.dataset.id,
+              name: this.components.student.inputs.name,
+              grade: this.components.student.inputs.grade
+            }
+          })
+          this.refresh()
+        }, update: ({id, name, grade}) => {
+          this.dataset.isHit = true
+          this.components.student.read({id}).refresh(name, grade)
+          this.refresh()
+        }
+      }
+      this.need = {
+        Student, Button
+      }
+    }
+    
+    refresh() {
+      this.$el('#edit').hidden = this.dataset.isHit ? '' : 'hidden'
+      this.$el('#btns').hidden = !this.dataset.isHit ? '' : 'hidden'
+    }
+  }
+  
+  class Main extends BSComponent {
+    constructor() {
+      super()
+      this.template = `
+        h3 {
+          students:
+        }
+        @Table table
+        @Panel panel
+      `
+      this.dataset = {
+        students: []
+      }
+      this.listen = {
+        save: ({student}) => {
+          if (!student.id) {
+            this.components.table.refresh('insert', student)
+          } else {
+            this.components.table.refresh('update', student.id, student)
+          }
+          this.components.panel.refresh()
+        }, update: ({id, name, grade}) => {
+          this.components.panel.signal({
+            signal: 'update', id, name, grade
+          })
+        }
+      }
+      this.need = {
+        Table, Panel
+      }
+    }
+  }
+  
+  new Main().paint($('#app'), 'replace')
+</script>
+</body>
+</html>

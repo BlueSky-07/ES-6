@@ -1,6 +1,18 @@
-import Renderer from '../template/Renderer.js'
-import Parser from '../template/Parser.js'
-import BSEvent from '../../BSEvent.js'
+/**
+ * Browser-Slim-XML
+ * @BlueSky
+ *
+ * Version Alpha, 3.3
+ *
+ * Last updated: 2018/8/27
+ *
+ */
+
+import Renderer from './template/Renderer.js'
+import Parser from './template/Parser.js'
+import BSEvent from '../BSEvent.js'
+import BSElement from './template/BSElement.js'
+import BSUnique from '../BSUnique.js'
 
 export default class BSComponent {
   constructor() {
@@ -17,6 +29,10 @@ export default class BSComponent {
     this.context = {}
     
     this.renderer = null
+    this.hash = BSUnique.getToken()
+    this.el = null
+    this.$el = null
+    this.$$el = null
   }
   
   init() {
@@ -85,20 +101,50 @@ export default class BSComponent {
   render() {
     this.init()
     this.beforeRender()
-    const domRoot = this.renderer.render()
+    const fragement = document.createDocumentFragment()
+    fragement.appendChild(BSElement.createComponentBlockMark(this.hash).compile())
+    fragement.appendChild(this.renderer.render())
+    fragement.appendChild(BSElement.createComponentBlockMark(this.hash).compile())
     Object.entries(this.need).forEach(([component, prototype]) => {
-      new Array().forEach.call(domRoot.querySelectorAll(`BSXml-Component[component=${component}]`), mark => {
+      new Array().forEach.call(fragement.querySelectorAll(`BSXml-Component[component='${component}']`), mark => {
         const name = mark.getAttribute('name')
         if (!this.components[name]) {
-          this.components[name] = new prototype()
+          const args = mark.getAttribute('args')
+          if (mark.getAttribute('args')) {
+            this.components[name] = new prototype(...args.split(' '))
+          } else {
+            this.components[name] = new prototype()
+          }
         }
         this.components[name].parent = this
         this.components[name].context = this.context
-        this.components[name].paint(mark, 'replace')
+        this.components[name].paint(mark, 'replace', fragement)
       })
     })
     this.afterRender()
-    return domRoot
+    return fragement
+  }
+  
+  paint(target, type = 'replace', document = window.document) {
+    this.beforePaint()
+    this.render().paint(target, type)
+    this.el = document.querySelector(`bsxc[hash='${this.hash}']`).nextElementSibling
+    this.$el = this.el.querySelector.bind(this.el)
+    this.$$el = this.el.querySelectorAll.bind(this.el)
+    this.afterPaint()
+  }
+  
+  refresh() {
+    this.beforeRefresh()
+    const start = document.querySelector(`bsxc[hash='${this.hash}']`)
+    let next = start.nextSibling
+    while (next.tagName !== 'BSXC' || !(next instanceof HTMLElement) || next.getAttribute('hash') !== this.hash) {
+      next.remove()
+      next = start.nextSibling
+    }
+    next.remove()
+    this.paint(start, 'replace')
+    this.afterRefresh()
   }
   
   notify(signal = '') {
@@ -115,10 +161,11 @@ export default class BSComponent {
     }
   }
   
-  paint(target, type = 'replace') {
-    this.beforePaint()
-    this.render().paint(target, type)
-    this.afterPaint()
+  needComponent(component, name, ...args) {
+    this.components[name] = new this.need[component](...args)
+    this.components[name].parent = this
+    this.components[name].context = this.context
+    return this.components[name]
   }
   
   // hooks:
@@ -133,5 +180,11 @@ export default class BSComponent {
   }
   
   afterPaint() {
+  }
+  
+  beforeRefresh() {
+  }
+  
+  afterRefresh() {
   }
 }

@@ -84,8 +84,8 @@ export default class Parser {
   
       // Component
       if (line.startsWith('@')) {
-        const [component, name] = line.slice(1).split(' ').filter(i => i.length > 0)
-        child.children.push(BSElement.createComponentMark(component, name))
+        const [component, name, ...args] = line.slice(1).split(' ').filter(i => i.length > 0)
+        child.children.push(BSElement.createComponentMark(component, name, args.join(' ')))
         continue
       }
       

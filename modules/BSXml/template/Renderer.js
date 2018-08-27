@@ -1,5 +1,5 @@
-import md5 from '../../libs/md5.js'
 import Parser from './Parser.js'
+import BSUnique from '../../BSUnique.js'
 
 export default class Renderer {
   constructor(parser, {
@@ -24,8 +24,8 @@ export default class Renderer {
     const domRoot = vdRoot.compile()
     const fragment = document.createDocumentFragment()
     
-    while(domRoot.children[0]) {
-      fragment.appendChild(domRoot.children[0])
+    while(domRoot.childNodes[0]) {
+      fragment.append(domRoot.childNodes[0])
     }
     
     // register events
@@ -62,20 +62,17 @@ export default class Renderer {
         fragment.querySelectorAll('BSXml-Input'),
         mark => {
           const target = mark.nextElementSibling
-          const inputName = `${(target.getAttribute('name') || new Date().getTime())}`
-          const hash = md5(inputName)
-          target.setAttribute('md5', hash)
+          const hash = BSUnique.getToken()
+          const inputName = target.getAttribute('dict') || hash
           Object.defineProperty(
               this.inputs,
               inputName, {
                 configurable: false,
                 enumerable: true,
                 get: () => {
-                  const hash = md5(inputName)
                   return this._inputs_.get(hash).value
                 },
                 set: value => {
-                  const hash = md5(inputName)
                   this._inputs_.get(hash).value = value
                 }
               }
