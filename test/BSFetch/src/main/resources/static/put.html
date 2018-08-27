@@ -28,22 +28,18 @@
 <script type="module">
   import BSFetch from './js/BSFetch.js'
   
-  Object.defineProperty(Number.prototype, 'means', {
-    get() {
-      return () => {
-        switch (this) {
-          case 201:
-            return 'created'
-          case 204:
-            return 'no changes'
-          case 200:
-            return 'updated'
-          default:
-            return 'unknown'
-        }
-      }
+  Number.prototype.means = function() {
+    switch (this) {
+      case 201:
+        return 'created'
+      case 204:
+        return 'no changes'
+      case 200:
+        return 'updated'
+      default:
+        return 'unknown'
     }
-  })
+  }
   
   BSFetch.put('/put/msg/default', {
     debug: true,

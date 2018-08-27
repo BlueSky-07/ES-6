@@ -22,22 +22,18 @@
 <script type="module">
   import BSFetch from './js/BSFetch.js'
   
-  Object.defineProperty(Number.prototype, 'means', {
-    get() {
-      return () => {
-        switch (this) {
-          case 202:
-            return 'will be deleted soon'
-          case 204:
-            return 'deleted'
-          case 200:
-            return 'deleted, received following detail:'
-          default:
-            return 'unknown'
-        }
-      }
+  Number.prototype.means = function () {
+    switch (this) {
+      case 202:
+        return 'will be deleted soon'
+      case 204:
+        return 'deleted'
+      case 200:
+        return 'deleted, received following detail:'
+      default:
+        return 'unknown'
     }
-  })
+  }
   
   BSFetch.fetch('/delete/msg/default', 'delete', {
     debug: true,

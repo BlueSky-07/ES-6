@@ -92,7 +92,7 @@ ihint.me: [https://pages.ihint.me/?BSBind](https://pages.ihint.me/?BSBind)
 ### BSXml
 
 `Browser-Slim-XML`
-`v3.0`
+`v3.2`
 
 [源码](/modules/BSXml)
 [测试](/test/BSXml)
@@ -104,7 +104,7 @@ ihint.me: [https://pages.ihint.me/?BSBind](https://pages.ihint.me/?BSBind)
 ### BSXml-Lite
 
 `Browser-Slim-XML-Renderer`
-`v2.3`
+`v2.4`
 
 [源码](/modules/BSXmlLite.js)
 [测试](/test/BSXmlLite)

@@ -3,18 +3,58 @@ import Parser from '../template/Parser.js'
 import BSEvent from '../../BSEvent.js'
 
 export default class BSComponent {
-  constructor({template = '', dataset = {}, functions = {}, need = {}, listen = {}} = {}) {
-    this.template = template
-    this.parser = new Parser(template)
-    this.renderer = new Renderer(this.parser, {dataset, functions})
-    this.renderer.component = this
-    this.dataset = this.renderer.dataset
-    this.functions = this.renderer.functions
-    this.need = need
+  constructor() {
+    this.template = ''
+    this.dataset = {}
+    this.functions = {}
+    this.need = {}
+    this.listen = {}
+    this.inputs = {}
+    
     this.components = {}
     this.parent = null
     this.emitter = new BSEvent(new Date().getTime())
-    this.listen = listen
+    this.context = {}
+    
+    this.renderer = null
+  }
+  
+  init() {
+    if (this.renderer) {
+      return
+    }
+    
+    if (typeof this.template !== 'string') {
+      throw new Error('template must be a string')
+    }
+    if (typeof this.dataset !== 'object') {
+      throw new Error('dataset must be an object')
+    }
+    if (typeof this.functions !== 'object') {
+      throw new Error('functions must be an object')
+    }
+    if (typeof this.need !== 'object') {
+      throw new Error('need must be an object')
+    }
+    if (typeof this.listen !== 'object') {
+      throw new Error('listen must be an object')
+    }
+    
+    this.renderer = new Renderer(new Parser(this.template), {
+      dataset: this.dataset, functions: this.functions
+    })
+    this.renderer.component = this
+    this.inputs = this.renderer.inputs
+    
+    Object.defineProperty(this, 'template', {
+      configurable: false,
+      get() {
+        return this.renderer.parser.template
+      },
+      set(template) {
+        this.renderer.parser.template = template
+      }
+    })
     
     Object.entries(this.listen).forEach(([signal, callback]) => {
       if (signal.startsWith('_')) {
@@ -26,13 +66,15 @@ export default class BSComponent {
   }
   
   read(dataset) {
+    this.init()
     Object.entries(dataset).forEach(([key, value]) => {
-      this.renderer.dataset[key] = value
+      this.dataset[key] = value
     })
     return this
   }
   
   plug(components = {}) {
+    this.init()
     Object.entries(components).forEach(([name, component]) => {
       this.components[name] = component
       this.components[name].parent = this
@@ -41,17 +83,21 @@ export default class BSComponent {
   }
   
   render() {
+    this.init()
+    this.beforeRender()
     const domRoot = this.renderer.render()
     Object.entries(this.need).forEach(([component, prototype]) => {
       new Array().forEach.call(domRoot.querySelectorAll(`BSXml-Component[component=${component}]`), mark => {
         const name = mark.getAttribute('name')
         if (!this.components[name]) {
           this.components[name] = new prototype()
-          this.components[name].parent = this
         }
+        this.components[name].parent = this
+        this.components[name].context = this.context
         this.components[name].paint(mark, 'replace')
       })
     })
+    this.afterRender()
     return domRoot
   }
   
@@ -64,12 +110,28 @@ export default class BSComponent {
   signal(signal = '') {
     if (typeof signal === 'string') {
       this.emitter.emit(signal)
-    } else if(signal.signal){
+    } else if (signal.signal) {
       this.emitter.emit(signal.signal, signal)
     }
   }
   
   paint(target, type = 'replace') {
+    this.beforePaint()
     this.render().paint(target, type)
+    this.afterPaint()
+  }
+  
+  // hooks:
+  
+  beforeRender() {
+  }
+  
+  afterRender() {
+  }
+  
+  beforePaint() {
+  }
+  
+  afterPaint() {
   }
 }

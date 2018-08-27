@@ -2,10 +2,10 @@
  * Browser-Slim-XML-Renderer
  * @BlueSky
  *
- * Version Alpha, 2.3
+ * Version Alpha, 2.4
  * Based on BSXml v3.0
  *
- * Last updated: 2018/8/24
+ * Last updated: 2018/8/25
  *
  */
 
@@ -155,9 +155,9 @@ const showRendered = (vdRoot, templateNode, functions, dataset) => {
   const parentNode = templateNode.parentNode
   const domNodes = vdRoot.render()
   const fragment = document.createDocumentFragment()
-  new Array().forEach.call(domNodes.children, element => {
-    fragment.appendChild(element)
-  })
+  while (domNodes.children[0]) {
+    fragment.appendChild(domNodes.children[0])
+  }
   
   // register events
   new Array().forEach.call(

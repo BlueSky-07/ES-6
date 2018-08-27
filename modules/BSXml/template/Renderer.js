@@ -13,33 +13,20 @@ export default class Renderer {
     }
     
     this.functions = functions
-    this.dataset = Object.assign({}, dataset)
-    this._dataStorage_ = new Map()
+    this.dataset = dataset
     this.inputs = {}
     this._inputs_ = new Map()
     this.component = null
-    
-    Object.entries(this.dataset).forEach(([key, value]) => {
-      Object.defineProperty(this.dataset, key, {
-        configurable: false,
-        get: () => {
-          return this._dataStorage_.get(key)
-        },
-        set: value => {
-          this._dataStorage_.set(key, value)
-        }
-      })
-      this.dataset[key] = value
-    })
   }
   
   render() {
     const vdRoot = this.parser.compile(this.dataset)
     const domRoot = vdRoot.compile()
     const fragment = document.createDocumentFragment()
-    new Array().forEach.call(domRoot.children, element => {
-      fragment.appendChild(element)
-    })
+    
+    while(domRoot.children[0]) {
+      fragment.appendChild(domRoot.children[0])
+    }
     
     // register events
     new Array().forEach.call(
@@ -101,40 +88,33 @@ export default class Renderer {
   }
 }
 
-Object.defineProperty(
-    DocumentFragment.prototype,
-    'paint', {
-      get() {
-        return (target, type = 'before') => {
-          if (!(target instanceof HTMLElement)) {
-            throw new Error('target should be an instance of HTMLElement')
-          }
-          switch (type) {
-            case 'before':
-              target.parentNode.insertBefore(this, target)
-              break
-            case 'after':
-              if (target.nextElementSibling) {
-                target.parentNode.insertBefore(this, target.nextElementSibling)
-              } else {
-                target.parentNode.appendChild(this)
-              }
-              break
-            case 'replace':
-              target.parentNode.replaceChild(this, target)
-              break
-            case 'push':
-              if (target.children[0]) {
-                target.insertBefore(this, target.children[0])
-              } else {
-                target.appendChild(this)
-              }
-              break
-            case 'append':
-              target.appendChild(this)
-              break
-          }
-        }
+DocumentFragment.prototype.paint = function (target, type = 'before') {
+  if (!(target instanceof HTMLElement)) {
+    throw new Error('target should be an instance of HTMLElement')
+  }
+  switch (type) {
+    case 'before':
+      target.parentNode.insertBefore(this, target)
+      break
+    case 'after':
+      if (target.nextElementSibling) {
+        target.parentNode.insertBefore(this, target.nextElementSibling)
+      } else {
+        target.parentNode.appendChild(this)
       }
-    }
-)
+      break
+    case 'replace':
+      target.parentNode.replaceChild(this, target)
+      break
+    case 'push':
+      if (target.children[0]) {
+        target.insertBefore(this, target.children[0])
+      } else {
+        target.appendChild(this)
+      }
+      break
+    case 'append':
+      target.appendChild(this)
+      break
+  }
+}

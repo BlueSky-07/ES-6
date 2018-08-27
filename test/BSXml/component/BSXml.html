@@ -13,69 +13,142 @@
 <script type="module">
   import BSComponent from '//node.com/modules/BSXml/component/BSComponent.js'
   
+  class Input extends BSComponent {
+    constructor() {
+      super()
+      this.template = `
+        input {
+          ~ name {{$name}}
+          ~ placeholder {{$placeholder}}
+          ! click clear
+          ! keyup typed
+        }
+      `
+      this.dataset = {
+        name: 'text',
+        placeholder: ''
+      }
+      this.functions = {
+        typed({inputs, $this}) {
+          $this.notify({
+            signal: 'text', text: inputs[$this.dataset.name]
+          })
+        },
+        clear({target}) {
+          target.value = ''
+        }
+      }
+    }
+  
+  }
+  
   class Button extends BSComponent {
     constructor() {
-      super({
-        template: `
+      super()
+      this.template = `
           button {
             !click hit
-            hit {{$name}}
+            {{$name}}
           }
-        `, dataset: {
-          count: 0,
-          name: ''
-        }, functions: {
-          hit({dataset, $this}) {
-            dataset.count++
-            console.log(`hit ${dataset.count} time${dataset.count > 1 ? 's' : ''}`)
-            $this.notify({
-              signal: 'greet', last: new Date()
-            })
+        `
+      this.dataset = {
+        count: 0,
+        name: 'button'
+      }
+      this.functions = {
+        hit({dataset, $this}) {
+          dataset.count++
+          console.log(`hit ${dataset.count} time${dataset.count > 1 ? 's' : ''}`)
+          const current = new Date()
+          if (!$this.context.logs) {
+            $this.context.logs = []
           }
+          $this.context.logs.push({
+            count: dataset.count, time: current
+          })
+          $this.notify({
+            signal: 'greet', last: current
+          })
         }
-      })
+      }
     }
   }
   
   class Page extends BSComponent {
     constructor() {
-      super({
-        template: `
+      super()
+      this.template = `
           div #page {
-            h3 #greeting {
-              {{$greeting}}
+            h3 {
+              p {
+                welcome
+                
+                span #username {
+                }
+              }
+              p #greeting {
+                {{$greeting}}
+              }
             }
+            @Input username
+            @Input message
             @Button {{$button}}
           }
-        `, dataset: {
-          greeting: 'unset',
-          button: 'btn'
-        }, functions: {
-          greet({$this}) {
-            const count = $this.components.btn.dataset.count
-            $this.dataset.greeting = `worked again for ${count} time${count > 1 ? 's' : ''}`
-            this.render()
-          },
-          render: () => {
-            document.querySelector('#greeting').innerText = this.dataset.greeting
-          }
-        }, need: {
-          Button
-        }, listen: {
-          greet: ({last}) => {
-            console.log('last hit at ' + last.toLocaleString())
-            this.functions.greet({$this:this})
-          }
+        `
+      this.dataset = {
+        greeting: 'unset',
+        button: 'hit'
+      }
+      this.functions = {
+        greet({$this}) {
+          document.querySelector('#username').innerText = $this.components.username.inputs.username
+          const count = $this.components.hit.dataset.count
+          $this.dataset.greeting = `worked again for ${count} time${count > 1 ? 's' : ''}`
+          this.render()
+          this.printLogs()
+        },
+        render: () => {
+          document.querySelector('#greeting').innerText = this.dataset.greeting
+        },
+        printLogs: () => {
+          console.log('recent 3 logs:')
+          this.context.logs.slice(-3).forEach(({count, time}) => {
+            console.log(`${count}: ${time.toLocaleString()}`)
+          })
         }
-      })
+      }
+      this.need = {
+        Button, Input
+      }
+      this.listen = {
+        greet: ({last}) => {
+          console.log('last hit at ' + last.toLocaleString())
+          this.functions.greet({$this: this})
+          this.components.message.inputs.text = `received:` + this.components.message.inputs.text
+        },
+        text: ({text}) => {
+          console.log('typed: ' + text)
+        }
+      }
+    }
+    
+    beforePaint() {
+      console.log(document.querySelector('#page'))
+    }
+    
+    afterPaint() {
+      console.log(document.querySelector('#page'))
     }
   }
   
   new Page().read({
     greeting: 'BSXml component worked!'
   }).plug({
-    btn: new Button().read({
-      name: 'me'
+    hit: new Button().read({
+      name: 'hit'
+    }),
+    username: new Input().read({
+      name: 'username', placeholder: 'username'
     })
   }).paint(document.querySelector('#root'), 'append')
 </script>

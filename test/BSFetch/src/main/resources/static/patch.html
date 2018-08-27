@@ -28,18 +28,14 @@
 <script type="module">
   import BSFetch from './js/BSFetch.js'
   
-  Object.defineProperty(Number.prototype, 'means', {
-    get() {
-      return () => {
-        switch (this) {
-          case 204:
-            return 'patched'
-          default:
-            return 'unknown'
-        }
-      }
+  Number.prototype.means = function() {
+    switch (this) {
+      case 204:
+        return 'patched'
+      default:
+        return 'unknown'
     }
-  })
+  }
   
   BSFetch.patch('/patch/msg/default', {
     debug: true,
