@@ -54,6 +54,12 @@ export default class BSElement {
   static createComponentBlockMark(hash) {
     return new BSElement('bsxc', {hash})
   }
+  
+  static createStyleBlock(styles) {
+    const style = new BSElement('style', {scoped: true})
+    style.children.push(styles)
+    return style
+  }
 }
 
 // HTML tags reference
