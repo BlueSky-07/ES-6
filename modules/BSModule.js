@@ -2,9 +2,9 @@
  * Browser-Simple-Module
  * @BlueSky
  *
- * Version Alpha, 1.4
+ * Version Alpha, 1.5
  *
- * Last updated: 2018/8/28
+ * Last updated: 2018/8/29
  *
  */
 import md5 from './libs/md5.js'
@@ -214,6 +214,9 @@ class BSModule {
   }
   
   static jumpAtIndex({filenames = ['index.html', '/'], indexPath = '/'} = {}) {
+    if (location.hash.length > 0) {
+      return
+    }
     if (!Array.isArray(filenames)) {
       filenames = [filenames]
     }
