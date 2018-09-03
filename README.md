@@ -92,12 +92,12 @@ ihint.me: [https://pages.ihint.me/?BSBind](https://pages.ihint.me/?BSBind)
 ### BSXml
 
 `Browser-Slim-XML`
-`v3.3`
+`v3.4`
 
 [源码](/modules/BSXml)
 [测试](/test/BSXml)
 
-这是一个关于模版引擎渲染、事件注册、输入框双向绑定的简单实现。该工具仅用作学习用途，如需在实际环境中使用还需要更多的测试与完善。
+这是一个关于模版引擎渲染、事件注册、输入框双向绑定、组件化开发的简单实现。该工具仅用作学习用途，如需在实际环境中使用还需要更多的测试与完善。
 
 ----
 
@@ -109,6 +109,6 @@ ihint.me: [https://pages.ihint.me/?BSBind](https://pages.ihint.me/?BSBind)
 [源码](/modules/BSXmlLite.js)
 [测试](/test/BSXmlLite)
 
-这是一个关于模版引擎渲染、事件注册、输入框双向绑定的简单实现。该工具仅用作学习用途，如需在实际环境中使用还需要更多的测试与完善。
+这是 `Browser-Slim-XML` 的单文件版，包含模版引擎渲染、事件注册、输入框双向绑定功能，不包含组件化开发功能。该工具仅用作学习用途，如需在实际环境中使用还需要更多的测试与完善。
 
 *Lite 版将不再更新，此版本功能实现与 BSXml v3.0 完全一致*
