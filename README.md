@@ -89,6 +89,24 @@ ihint.me: [https://pages.ihint.me/?BSBind](https://pages.ihint.me/?BSBind)
 
 ----
 
+### BSEvent
+
+`Browser-Simple-EventEmitter`
+`v0.2`
+
+[源码](/modules/BSEvent.js)
+[测试](/test/BSEvent)
+
+这是一个关于事件处理的简单实现。该工具仅用作学习用途，如需在实际环境中使用还需要更多的测试与完善。
+
+#### 文档
+
+github.io: [https://bluesky-07.github.io/?BSEvent](https://bluesky-07.github.io/?BSEvent)
+
+ihint.me: [https://pages.ihint.me/?BSEvent](https://pages.ihint.me/?BSEvent)
+
+----
+
 ### BSXml
 
 `Browser-Slim-XML`

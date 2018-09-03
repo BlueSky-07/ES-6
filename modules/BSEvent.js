@@ -61,8 +61,8 @@ class BSEvent {
     }
   }
   
-  once(name, callback) {
-    this.on(name, callback, true)
+  once(name, callbacks) {
+    this.on(name, callbacks, true)
   }
   
   emit(name = '', ...args) {
