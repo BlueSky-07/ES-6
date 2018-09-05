@@ -1,5 +1,5 @@
 import Parser from './Parser.js'
-import BSUnique from '../../BSUnique.js'
+import uuid from '../../libs/uuid.js'
 
 export default class Renderer {
   constructor(parser, {
@@ -62,7 +62,7 @@ export default class Renderer {
         fragment.querySelectorAll('BSXml-Input'),
         mark => {
           const target = mark.nextElementSibling
-          const hash = BSUnique.getToken()
+          const hash = uuid()
           const inputName = target.getAttribute('dict') || hash
           Object.defineProperty(
               this.inputs,

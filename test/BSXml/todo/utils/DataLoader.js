@@ -1,5 +1,5 @@
 import BSFetch from '//node.com/modules/BSFetch.js'
-import BSUnique from '//node.com/modules/BSUnique.js'
+import uuid from '//node.com/modules/libs/uuid.js'
 
 export default class DataLoader {
   static async getTimeline() {
@@ -12,7 +12,7 @@ export default class DataLoader {
   }
   
   static async addTimepoint(tp) {
-    const id = BSUnique.getToken()
+    const id = uuid()
     DataLoader.storage.push(Object.assign({
       id, date: new Date(tp.date).toISOString()
     }, tp))

@@ -110,7 +110,7 @@ ihint.me: [https://pages.ihint.me/?BSEvent](https://pages.ihint.me/?BSEvent)
 ### BSXml
 
 `Browser-Slim-XML`
-`v3.4`
+`v3.5`
 
 [源码](/modules/BSXml)
 [测试](/test/BSXml)

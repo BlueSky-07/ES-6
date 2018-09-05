@@ -2,7 +2,7 @@
  * Browser-Slim-XML
  * @BlueSky
  *
- * Version Alpha, 3.4
+ * Version Alpha, 3.5
  *
  * Last updated: 2018/8/29
  *
@@ -12,7 +12,7 @@ import Renderer from './template/Renderer.js'
 import Parser from './template/Parser.js'
 import BSEvent from '../BSEvent.js'
 import BSElement from './template/BSElement.js'
-import BSUnique from '../BSUnique.js'
+import uuid from '../libs/uuid.js'
 
 export default class BSComponent {
   constructor() {
@@ -30,7 +30,7 @@ export default class BSComponent {
     this.context = {}
     
     this.renderer = null
-    this.hash = BSUnique.getToken()
+    this.hash = uuid()
     this.el = null
     this.$el = null
     this.$$el = null

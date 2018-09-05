@@ -2,7 +2,7 @@
  * Browser-Slim-XML
  * @BlueSky
  *
- * Version Alpha, 3.4
+ * Version Alpha, 3.5
  *
  * Last updated: 2018/8/28
  *
