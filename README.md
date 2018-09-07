@@ -122,7 +122,7 @@ ihint.me: [https://pages.ihint.me/?BSEvent](https://pages.ihint.me/?BSEvent)
 ### BSXml-Lite
 
 `Browser-Slim-XML-Renderer`
-`v2.5`
+`v2.6`
 
 [源码](/modules/BSXmlLite.js)
 [测试](/test/BSXmlLite)

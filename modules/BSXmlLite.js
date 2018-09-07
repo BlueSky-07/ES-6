@@ -2,13 +2,14 @@
  * Browser-Slim-XML-Renderer
  * @BlueSky
  *
- * Version Alpha, 2.5
+ * Version Alpha, 2.6
  *
- * Last updated: 2018/8/27
+ * Last updated: 2018/9/7
  *
  */
 
 import md5 from './libs/md5.js'
+import uuid from './libs/uuid.js'
 import BSFetch from './BSFetch.js'
 
 class El {
@@ -184,7 +185,7 @@ const showRendered = (vdRoot, templateNode, functions, dataset) => {
       fragment.querySelectorAll('BSXml-Input'),
       mark => {
         const target = mark.nextElementSibling
-        const inputName = `${(target.getAttribute('dict') || new Date().getTime())}`
+        const inputName = `${(target.getAttribute('dict') || uuid())}`
         const hash = md5(inputName)
         target.setAttribute('md5', hash)
         Object.defineProperty(
@@ -357,6 +358,9 @@ const generateVirtualDOM = (template = '', dataset = {}) => {
     } else {
       child.children.push(el)
     }
+  }
+  if (child.tagName !== 'vdRoot' || parents.length !== 0) {
+    throw new Error('template has mistake(s)')
   }
   return child
 }

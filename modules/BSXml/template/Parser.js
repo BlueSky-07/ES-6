@@ -124,6 +124,9 @@ export default class Parser {
         child.children.push(element)
       }
     }
+    if (child.tagName !== 'vdRoot' || parents.length !== 0) {
+      throw new Error('template has mistake(s)')
+    }
     return child
   }
 }
