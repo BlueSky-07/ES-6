@@ -8,7 +8,7 @@ export default class DataLoader {
   }
   
   static async getTimepointById(id) {
-    return await DataLoader.storage.filter(tp => String(tp.id) === String(id))[0] || {status: 'Not-Found'}
+    return await DataLoader.storage.find(tp => String(tp.id) === String(id)) || {status: 'Not-Found'}
   }
   
   static async addTimepoint(tp) {
