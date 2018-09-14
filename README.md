@@ -1,5 +1,31 @@
 ## ES-6
 
+### BSXml
+
+`Browser-Slim-XML`
+`v3.5`
+
+[源码](/modules/BSXml)
+[测试](/test/BSXml)
+
+这是一个关于模版引擎渲染、事件注册、输入框双向绑定、组件化开发的简单实现。该工具仅用作学习用途，如需在实际环境中使用还需要更多的测试与完善。
+
+#### 文档
+
+模版引擎渲染、事件注册、输入框双向绑定：
+
+github.io: [https://bluesky-07.github.io/?BSXml-Template](https://bluesky-07.github.io/?BSXml-Template)
+
+ihint.me: [https://pages.ihint.me/?BSXml-Template](https://pages.ihint.me/?BSXml-Template)
+
+组件化开发：
+
+github.io: [https://bluesky-07.github.io/?BSXml-Component](https://bluesky-07.github.io/?BSXml-Component)
+
+ihint.me: [https://pages.ihint.me/?BSXml-Component](https://pages.ihint.me/?BSXml-Component)
+
+----
+
 ### BSModule
 
 `Browser-Simple-Module`
@@ -104,18 +130,6 @@ ihint.me: [https://pages.ihint.me/?BSBind](https://pages.ihint.me/?BSBind)
 github.io: [https://bluesky-07.github.io/?BSEvent](https://bluesky-07.github.io/?BSEvent)
 
 ihint.me: [https://pages.ihint.me/?BSEvent](https://pages.ihint.me/?BSEvent)
-
-----
-
-### BSXml
-
-`Browser-Slim-XML`
-`v3.5`
-
-[源码](/modules/BSXml)
-[测试](/test/BSXml)
-
-这是一个关于模版引擎渲染、事件注册、输入框双向绑定、组件化开发的简单实现。该工具仅用作学习用途，如需在实际环境中使用还需要更多的测试与完善。
 
 ----
 
