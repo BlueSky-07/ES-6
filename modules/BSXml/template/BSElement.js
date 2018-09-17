@@ -56,7 +56,7 @@ export default class BSElement {
   }
   
   static createStyleBlock(styles) {
-    const style = new BSElement('style', {scoped: true})
+    const style = new BSElement('style')
     style.children.push(styles)
     return style
   }

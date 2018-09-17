@@ -1,10 +1,10 @@
 /**
- * Browser-Slim-XML
+ * Browser-Slim-XML-Component
  * @BlueSky
  *
  * Version Alpha, 3.5
  *
- * Last updated: 2018/8/29
+ * Last updated: 2018/9/17
  *
  */
 
@@ -16,20 +16,22 @@ import uuid from '../libs/uuid.js'
 
 export default class BSComponent {
   constructor() {
+    this.need = {}
+  
     this.template = ''
     this.style = ''
     this.dataset = {}
     this.functions = {}
-    this.need = {}
-    this.listen = {}
     this.inputs = {}
     
+    this.renderer = null
+    this.emitter = new BSEvent(uuid())
+    this.listen = {}
+  
     this.components = {}
     this.parent = null
-    this.emitter = new BSEvent(new Date().getTime())
     this.context = {}
     
-    this.renderer = null
     this.hash = uuid()
     this.el = null
     this.$el = null
@@ -126,7 +128,7 @@ export default class BSComponent {
               const name = mark.getAttribute('name')
               if (!this.components[name]) {
                 const args = mark.getAttribute('args')
-                if (mark.getAttribute('args')) {
+                if (args) {
                   this.components[name] = new prototype(...args.split(' '))
                 } else {
                   this.components[name] = new prototype()
