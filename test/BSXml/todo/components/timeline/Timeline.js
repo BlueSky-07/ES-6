@@ -51,43 +51,8 @@ export default class Timeline extends BSComponent {
       cancelDelete: () => {
         this.refresh('trash-leave')
       },
-      delete: ({event, dataset, notNotify}) => {
-        const id = event.dataTransfer.getData('id')
-        const tpCom = this.components['tp-' + id]
-        tpCom.refresh('drop')
-        this.refresh('trash-hide')
-        delete this.components['tp-' + id]
-        const timepoint = dataset.timepoints.filter(tp => String(tp.id) === String(id))[0]
-        this.read({
-          timepoints: dataset.timepoints.filter(tp => String(tp.id) !== String(id))
-        })
-        if (this.dataset.timepoints.length === 0) {
-          this.refresh()
-        }
-        if (!notNotify) {
-          this.notify({
-            signal: 'system-out',
-            message: `[DROP] ${timepoint.title}
-                   Due: ${new Date(timepoint.date).toLocaleString()}
-                   ${timepoint.content ? 'Detail: ' + timepoint.content + '\n' : ''}`,
-            style: 'drop'
-          })
-        }
-        DataLoader.deleteTimepointById(id)
-            .then(() => {
-              this.notify({
-                signal: 'system-out',
-                message: `[SYNC-DROPPED]\n`,
-                style: 'default'
-              })
-            })
-            .catch(() => {
-              this.notify({
-                signal: 'system-out',
-                message: `[SYNC-ERROR]: Fail to drop, check network\n`,
-                style: 'default'
-              })
-            })
+      delete: ({event}) => {
+        this.refresh('finish', event.dataTransfer.getData('id'), false)
       }
     }
     this.style = `
@@ -242,13 +207,43 @@ export default class Timeline extends BSComponent {
         break
       }
       case 'finish': {
-        const dataTransfer = new DataTransfer()
-        dataTransfer.setData('id', args[0])
-        this.functions.delete({
-          event: {dataTransfer},
-          dataset: this.dataset,
-          notNotify: true
+        const id = args[0]
+        const notNotify = args[1] || true
+        const tpCom = this.components['tp-' + id]
+        tpCom.refresh('drop')
+        this.refresh('trash-hide')
+        delete this.components['tp-' + id]
+        const timepoint = this.dataset.timepoints.filter(tp => String(tp.id) === String(id))[0]
+        this.read({
+          timepoints: this.dataset.timepoints.filter(tp => String(tp.id) !== String(id))
         })
+        if (this.dataset.timepoints.length === 0) {
+          this.refresh()
+        }
+        if (!notNotify) {
+          this.notify({
+            signal: 'system-out',
+            message: `[DROP] ${timepoint.title}
+                   Due: ${new Date(timepoint.date).toLocaleString()}
+                   ${timepoint.content ? 'Detail: ' + timepoint.content + '\n' : ''}`,
+            style: 'drop'
+          })
+        }
+        DataLoader.deleteTimepointById(id)
+            .then(() => {
+              this.notify({
+                signal: 'system-out',
+                message: `[SYNC-DROPPED]\n`,
+                style: 'default'
+              })
+            })
+            .catch(() => {
+              this.notify({
+                signal: 'system-out',
+                message: `[SYNC-ERROR]: Fail to drop, check network\n`,
+                style: 'default'
+              })
+            })
         break
       }
       default:
