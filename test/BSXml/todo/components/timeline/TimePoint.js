@@ -44,15 +44,6 @@ export default class TimePoint extends BSComponent {
     }
   }
   
-  afterPaint() {
-    this.els = {
-      title: this.$el('#title'),
-      date: this.$el('#date')
-    }
-    this.els.title.innerText = this.dataset.title
-    this.els.date.innerText = this.dataset.date
-  }
-  
   refresh(command, ...args) {
     switch (command) {
       case 'drop': {
