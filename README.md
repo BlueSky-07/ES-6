@@ -3,7 +3,7 @@
 ### BSXml
 
 `Browser-Slim-XML`
-`v3.5`
+`v3.6`
 
 [源码](/modules/BSXml)
 [测试](/test/BSXml)

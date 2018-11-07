@@ -2,9 +2,9 @@
  * Browser-Slim-XML-Component
  * @BlueSky
  *
- * Version Alpha, 3.5
+ * Version Alpha, 3.6
  *
- * Last updated: 2018/9/17
+ * Last updated: 2018/11/7
  *
  */
 
@@ -32,10 +32,12 @@ export default class BSComponent {
     this.parent = null
     this.context = {}
     
-    this.hash = uuid()
+    this.uuid = uuid().slice(0, 8)
     this.el = null
     this.$el = null
     this.$$el = null
+    this.$_start = null
+    this.$_end = null
   }
   
   init() {
@@ -79,7 +81,7 @@ export default class BSComponent {
     })
     
     this.styleBlock = BSElement.createStyleBlock(this.style)
-    this.blockMark = BSElement.createComponentBlockMark(this.hash)
+    this.blockMark = BSElement.createComponentBlockMark(this.uuid)
     
     Object.entries(this.listen).forEach(([signal, callback]) => {
       if (signal.startsWith('_')) {
@@ -162,9 +164,24 @@ export default class BSComponent {
         })
         .then(fragment => {
           fragment.paint(target, type)
-          this.el = document.querySelector(`bsxc[hash='${this.hash}']`).nextElementSibling
+          this.el = document.querySelector(`bsxc[uuid='${this.uuid}']`).nextElementSibling
           this.$el = this.el.querySelector.bind(this.el)
           this.$$el = this.el.querySelectorAll.bind(this.el)
+          return 'OK'
+        })
+        .then(() => {
+          this.$_start = null
+          this.$_end = null
+          new Array().forEach.call(document.querySelectorAll(`bsxc[uuid='${this.uuid}']`), bsxc => {
+            const uuid = bsxc.getAttribute('uuid')
+            const comment = window.document.createComment(`BSXC[${uuid}]: ${this.constructor.name}`)
+            bsxc.parentNode.replaceChild(comment, bsxc)
+            if (!this.$_start) {
+              this.$_start = comment
+            } else if (!this.$_end) {
+              this.$_end = comment
+            }
+          })
           return 'OK'
         })
         .then(async () => {
@@ -181,14 +198,13 @@ export default class BSComponent {
           return await this.beforeRefresh()
         })
         .then(() => {
-          const start = document.querySelector(`bsxc[hash='${this.hash}']`)
-          let next = start.nextSibling
-          while (next.tagName !== 'BSXC' || !(next instanceof HTMLElement) || next.getAttribute('hash') !== this.hash) {
+          let next = this.$_start.nextSibling
+          while (next !== this.$_end) {
             next.remove()
-            next = start.nextSibling
+            next = this.$_start.nextSibling
           }
           next.remove()
-          this.paint(start, 'replace')
+          this.paint(this.$_start, 'replace')
           return 'OK'
         })
         .then(async () => {

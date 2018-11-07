@@ -36,10 +36,6 @@ export default class Main extends BSComponent {
         background-color: #eee;
       }
       
-      bsxc {
-        display: none;
-      }
-      
       *::selection {
         background-color: transparent;
       }

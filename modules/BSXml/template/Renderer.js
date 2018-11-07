@@ -86,7 +86,7 @@ export default class Renderer {
 }
 
 DocumentFragment.prototype.paint = function (target, type = 'before') {
-  if (!(target instanceof HTMLElement)) {
+  if (!(target instanceof Node)) {
     throw new Error('target should be an instance of HTMLElement')
   }
   switch (type) {

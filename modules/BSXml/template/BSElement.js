@@ -51,8 +51,8 @@ export default class BSElement {
     return new BSElement('BSXml-Component', {component, name, args})
   }
   
-  static createComponentBlockMark(hash) {
-    return new BSElement('bsxc', {hash})
+  static createComponentBlockMark(uuid) {
+    return new BSElement('bsxc', {uuid})
   }
   
   static createStyleBlock(styles) {
