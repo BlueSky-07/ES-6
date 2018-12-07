@@ -29,7 +29,7 @@ ihint.me: [https://pages.ihint.me/?BSXml-Component](https://pages.ihint.me/?BSXm
 ### BSModule
 
 `Browser-Simple-Module`
-`v1.3`
+`v1.6`
 
 [源码](/modules/BSModule.js)
 [测试](/test/BSModule)
@@ -53,7 +53,7 @@ ihint.me: [https://pages.ihint.me/?BSModule](https://pages.ihint.me/?BSModule)
 ### BSFetch
 
 `Browser-Simple-Fetch`
-`v1.1`
+`v1.2`
 
 [源码](/modules/BSFetch.js)
 [测试](/test/BSFetch)

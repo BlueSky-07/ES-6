@@ -2,9 +2,9 @@
  * Browser-Simple-Fetch
  * @BlueSky
  *
- * Version Alpha, 1.1
+ * Version Alpha, 1.2
  *
- * Last updated: 2018/8/14
+ * Last updated: 2018/11/29
  *
  */
 import BSData from './BSData.js'
@@ -85,31 +85,31 @@ class BSFetch {
   }
   
   static async head(url = '', {data = {}, reqtype = '', restype = 'headers', cookies = '', headers = {}, debug = false} = {}) {
-    return this.fetch(url, 'HEAD', {data, reqtype, restype, cookies, headers, debug})
+    return BSFetch.fetch(url, 'HEAD', {data, reqtype, restype, cookies, headers, debug})
   }
   
   static async get(url = '', {data = {}, reqtype = '', restype = 'json', cookies = '', headers = {}, debug = false} = {}) {
-    return this.fetch(url, 'GET', {data, reqtype, restype, cookies, headers, debug})
+    return BSFetch.fetch(url, 'GET', {data, reqtype, restype, cookies, headers, debug})
   }
   
   static async post(url = '', {data = {}, reqtype = '', restype = 'json', cookies = '', headers = {}, debug = false} = {}) {
-    return this.fetch(url, 'POST', {data, reqtype, restype, cookies, headers, debug})
+    return BSFetch.fetch(url, 'POST', {data, reqtype, restype, cookies, headers, debug})
   }
   
   static async put(url = '', {data = {}, reqtype = '', restype = 'status', cookies = '', headers = {}, debug = false} = {}) {
-    return this.fetch(url, 'PUT', {data, reqtype, restype, cookies, headers, debug})
+    return BSFetch.fetch(url, 'PUT', {data, reqtype, restype, cookies, headers, debug})
   }
   
   static async delete(url = '', {data = {}, reqtype = '', restype = 'status', cookies = '', headers = {}, debug = false} = {}) {
-    return this.fetch(url, 'DELETE', {data, reqtype, restype, cookies, headers, debug})
+    return BSFetch.fetch(url, 'DELETE', {data, reqtype, restype, cookies, headers, debug})
   }
   
   static async patch(url = '', {data = {}, reqtype = '', restype = 'status', cookies = '', headers = {}, debug = false} = {}) {
-    return this.fetch(url, 'PATCH', {data, reqtype, restype, cookies, headers, debug})
+    return BSFetch.fetch(url, 'PATCH', {data, reqtype, restype, cookies, headers, debug})
   }
   
   static async options(url = '', {headers = {}, cookies = '', debug = false}) {
-    return this.fetch(url, 'OPTIONS', {headers, cookies, debug})
+    return BSFetch.fetch(url, 'OPTIONS', {headers, cookies, debug})
   }
   
   static async fetch(url = '#', method = 'GET', {
@@ -133,11 +133,11 @@ class BSFetch {
         restype = restype === 'response' ? restype : 'headers'
       case 'GET':
         if (data instanceof FormData) {
-          request.url += '?' + BSData.object_to_body(BSData.formdata_to_object(data))
+          request.url += '?' + BSData.object2Body(BSData.formdata2Object(data))
         } else if (Object.keys(data).length > 0) {
-          request.url += '?' + BSData.object_to_body(data)
+          request.url += '?' + BSData.object2Body(data)
         } else if (typeof data === 'string' && data.length > 0) {
-          request.url += '?' + BSData.object_to_body(BSData.json_to_object(data))
+          request.url += '?' + BSData.object2Body(BSData.json2Object(data))
         }
         break
       case 'PUT':
@@ -149,9 +149,9 @@ class BSFetch {
           case 'json':
             request.headers.set('Content-Type', ContentTypes.JSON)
             if (data instanceof FormData) {
-              request.body = BSData.object_to_json(BSData.formdata_to_object(data))
+              request.body = BSData.object2Json(BSData.formdata2Object(data))
             } else if (Object.keys(data).length > 0) {
-              request.body = BSData.object_to_json(data)
+              request.body = BSData.object2Json(data)
             } else if (typeof data === 'string' && data.length > 0) {
               request.body = data
             }
@@ -161,19 +161,19 @@ class BSFetch {
             if (data instanceof FormData) {
               request.body = data
             } else if (Object.keys(data).length > 0) {
-              request.body = BSData.object_to_formdata(data)
+              request.body = BSData.object2Formdata(data)
             } else if (typeof data === 'string' && data.length > 0) {
-              request.body = BSData.object_to_formdata(BSData.json_to_object(data))
+              request.body = BSData.object2Formdata(BSData.json2Object(data))
             }
             break
           default:
             request.headers.set('Content-Type', ContentTypes.FORM)
             if (data instanceof FormData) {
-              request.body = BSData.object_to_body(BSData.formdata_to_object(data))
+              request.body = BSData.object2Body(BSData.formdata2Object(data))
             } else if (Object.keys(data).length > 0) {
-              request.body = BSData.object_to_body(data)
+              request.body = BSData.object2Body(data)
             } else if (typeof data === 'string' && data.length > 0) {
-              request.body = BSData.object_to_body(BSData.json_to_object(data))
+              request.body = BSData.object2Body(BSData.json2Object(data))
             }
         }
         break

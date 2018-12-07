@@ -2,22 +2,22 @@
  * Browser-Simple-DataHandler
  * @BlueSky
  *
- * Version Alpha, 0.2
+ * Version Alpha, 0.3
  *
- * Last updated: 2018/8/13
+ * Last updated: 2018/11/29
  *
  */
 
 class BSData {
-  static object_to_json(data = {}) {
+  static object2Json(data = {}) {
     return JSON.stringify(data)
   }
   
-  static json_to_object(json_string = '') {
+  static json2Object(json_string = '') {
     return JSON.parse(json_string)
   }
   
-  static object_to_body(data = {}) {
+  static object2Body(data = {}) {
     let res = ''
     Object.entries(data)
         .forEach(
@@ -28,7 +28,7 @@ class BSData {
     return res.slice(1)
   }
   
-  static body_to_object(body_string = '') {
+  static body2Object(body_string = '') {
     const data = {}
     body_string
         .split('&')
@@ -46,7 +46,7 @@ class BSData {
     return data
   }
   
-  static formdata_to_object(formdata = new FormData()) {
+  static formdata2Object(formdata = new FormData()) {
     if (formdata instanceof FormData) {
       const data = {}
       for (const entry of formdata.entries()) {
@@ -59,7 +59,7 @@ class BSData {
     }
   }
   
-  static object_to_formdata(data = {}) {
+  static object2Formdata(data = {}) {
     const formdata = new FormData()
     Object.entries(data)
         .forEach(
